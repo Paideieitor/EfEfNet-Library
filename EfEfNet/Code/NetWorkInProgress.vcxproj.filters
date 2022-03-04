@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Private">
+      <UniqueIdentifier>{41684d11-dbf2-4ec5-b70e-4d8042a65b15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Public">
+      <UniqueIdentifier>{54a518ca-1163-4946-be9d-ad04d8612d9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Public\Sockets">
+      <UniqueIdentifier>{f3c7f4d1-b541-41fe-b6a9-e96ef007bb1b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="efefDebug.cpp">
+      <Filter>Source Files\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="efefGlobal.cpp">
+      <Filter>Source Files\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="efefSocketAddr.cpp">
+      <Filter>Source Files\Public</Filter>
+    </ClCompile>
+    <ClCompile Include="efefSocket.cpp">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="efefUDPSocket.cpp">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="efefTCPSocket.cpp">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClCompile>
+    <ClCompile Include="efefGeneral.cpp">
+      <Filter>Source Files\Public</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="efefDebug.h">
+      <Filter>Source Files\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="efefGlobal.h">
+      <Filter>Source Files\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="efefNet.h">
+      <Filter>Source Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="efefSocketAddr.h">
+      <Filter>Source Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="efefTypes.h">
+      <Filter>Source Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="efefSocket.h">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="efefUDPSocket.h">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="efefTCPSocket.h">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="efefGeneral.h">
+      <Filter>Source Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="efefInputStream.h">
+      <Filter>Source Files\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
