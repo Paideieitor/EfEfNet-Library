@@ -1,13 +1,7 @@
 #include "efefNet.h"
+#include "efefStreams.h"
 
 #include <iostream>
-
-void PrintMessage(byte* message, uint length)
-{
-	for (uint i = 0; i < length; ++i)
-		std::cout << message[i];
-	std::cout << std::endl;
-}
 
 int main()
 {
@@ -25,8 +19,11 @@ int main()
 	efef::socket_addr receiverAddr = efef::socket_addr(L"127.0.0.1", 6001);
 	receiver.Bind(receiverAddr);
 
-	const char* data = "Hello World!";
-	int bytesSent = sender.SendTo((const byte*)data, 12, receiverAddr);
+	efef::istream is;
+	is.PushVar(13);
+	is.PushArray("Hello World!", 13);
+
+	int bytesSent = sender.SendTo(is.Buffer(), is.Size(), receiverAddr);
 	if (bytesSent == EFEF_ERROR)
 	{
 		std::cout << "Send Error: " << efef::GetLastError() << std::endl;
@@ -44,7 +41,12 @@ int main()
 		return 0;
 	}
 
-	PrintMessage(buffer, 64);
+	efef::ostream os(buffer, bytesReceived);
+
+	uint sSize = os.GetVar<uint>();
+	char* sentence = new char[sSize];
+	std::cout << os.GetArray(sentence, sSize);
+	delete[] sentence;
 
 	if (efef::CleanUp() == EFEF_ERROR)
 	{

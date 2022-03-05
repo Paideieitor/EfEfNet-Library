@@ -22,6 +22,9 @@
     <Filter Include="Source Files\Public\Sockets">
       <UniqueIdentifier>{f3c7f4d1-b541-41fe-b6a9-e96ef007bb1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Public\Streams">
+      <UniqueIdentifier>{d955ca53-2021-4bd6-94e0-dc30e5c5ddc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -47,6 +50,12 @@
     </ClCompile>
     <ClCompile Include="efefGeneral.cpp">
       <Filter>Source Files\Public</Filter>
+    </ClCompile>
+    <ClCompile Include="efefInputStream.cpp">
+      <Filter>Source Files\Public\Streams</Filter>
+    </ClCompile>
+    <ClCompile Include="efefOutputStream.cpp">
+      <Filter>Source Files\Public\Streams</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,7 +87,13 @@
       <Filter>Source Files\Public</Filter>
     </ClInclude>
     <ClInclude Include="efefInputStream.h">
-      <Filter>Source Files\Public</Filter>
+      <Filter>Source Files\Public\Streams</Filter>
+    </ClInclude>
+    <ClInclude Include="efefOutputStream.h">
+      <Filter>Source Files\Public\Streams</Filter>
+    </ClInclude>
+    <ClInclude Include="efefStreams.h">
+      <Filter>Source Files\Public\Streams</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -142,6 +142,8 @@
     <ClCompile Include="efefDebug.cpp" />
     <ClCompile Include="efefGlobal.cpp" />
     <ClCompile Include="efefGeneral.cpp" />
+    <ClCompile Include="efefInputStream.cpp" />
+    <ClCompile Include="efefOutputStream.cpp" />
     <ClCompile Include="efefSocket.cpp" />
     <ClCompile Include="efefSocketAddr.cpp" />
     <ClCompile Include="efefTCPSocket.cpp" />
@@ -154,8 +156,10 @@
     <ClInclude Include="efefInputStream.h" />
     <ClInclude Include="efefNet.h" />
     <ClInclude Include="efefGeneral.h" />
+    <ClInclude Include="efefOutputStream.h" />
     <ClInclude Include="efefSocket.h" />
     <ClInclude Include="efefSocketAddr.h" />
+    <ClInclude Include="efefStreams.h" />
     <ClInclude Include="efefTCPSocket.h" />
     <ClInclude Include="efefTypes.h" />
     <ClInclude Include="efefUDPSocket.h" />
