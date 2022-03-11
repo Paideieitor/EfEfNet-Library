@@ -8,13 +8,14 @@ namespace efef
     {
     public:
 
-        int Connect(socket_addr& address);
-        int Connect(socket_addr&& address);
-        int Listen(int backLog = 0x7fffffff);
-        tcp_socket Accept(socket_addr& fromAddress);
+        int connect(socket_addr& address);
+        int connect(socket_addr&& address);
 
-        int Send(const byte* data, int dataLength);
-        int Receive(byte* buffer, int bufferLength);
+        int listen(int backLog = 0x7fffffff);
+        tcp_socket accept(socket_addr& fromAddress);
+
+        int send(const byte* data, int dataLength);
+        int receive(byte* buffer, int bufferLength);
 
     private:
 

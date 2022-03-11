@@ -1,7 +1,6 @@
 #pragma once
 
-#include "efefUDPSocket.h"
-#include "efefTCPSocket.h"
+#include "efefSocketSet.h"
 
 namespace efef
 {

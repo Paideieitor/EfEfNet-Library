@@ -23,4 +23,24 @@ namespace efef
 		IPv4,
 		IPv6
 	};
+
+	enum select_mode
+	{
+		SEND,
+		RECEIVE,
+		ERROR
+	};
+
+	template <class T>
+	void expand_array(T*& src, uint& srcCapacity)
+	{
+		T* dest = new T[srcCapacity * sizeof(T) * 2u];
+
+		for (uint i = 0; i < srcCapacity * sizeof(T); ++i)
+			dest[i] = src[i];
+		delete[] src;
+
+		src = dest;
+		srcCapacity *= 2;
+	}
 }

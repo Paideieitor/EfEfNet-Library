@@ -1,6 +1,6 @@
 #include "efefDebug.h"
 
-#include "efefGlobal.h"
+#include "efefPrivateGlobals.h"
 
 #ifdef EFEF_DEBUG
     #include <iostream>

@@ -1,6 +1,6 @@
 #include "efefGeneral.h"
 
-#include "efefGlobal.h"
+#include "efefPrivateGlobals.h"
 #include "efefDebug.h"
 
 int efef::Init()

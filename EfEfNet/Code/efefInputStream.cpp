@@ -1,32 +1,19 @@
 #include "efefInputStream.h"
 
-#include <vcruntime_string.h>
+#include "efefPrivateGlobals.h"
 
-efef::istream::istream() : size(0u), capacity(1u), stream(new byte[capacity]) {}
+efef::istream::istream() : mSize(0u), mCapacity(2u), mStream(new byte[mCapacity]) {}
 
-efef::istream::~istream() { delete[] stream; }
+efef::istream::~istream() { delete[] mStream; }
 
-const uint efef::istream::Size() const { return size; }
+const uint efef::istream::size() const { return mSize; }
 
-const byte* const efef::istream::Buffer() const { return stream; }
+const byte* const efef::istream::get_buffer() const { return mStream; }
 
-void efef::istream::Push(const byte& b)
+void efef::istream::push(const byte& b)
 {
-	if (size >= capacity)
-		Expand();
+	while (mSize >= mCapacity)
+		expand_array(mStream, mCapacity);
 
-	stream[size++] = b;
-}
-
-void efef::istream::Expand()
-{
-	byte* newStream = new byte[capacity * 2];
-
-	//for (uint i = 0; i < capacity; ++i)
-	//	newStream[i] = stream[i];
-	memcpy(newStream, stream, capacity);
-
-	delete[] stream;
-	stream = newStream;
-	capacity *= 2;
+	mStream[mSize++] = b;
 }

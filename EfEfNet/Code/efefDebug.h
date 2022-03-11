@@ -1,6 +1,6 @@
 #pragma once
 
-#include "efefTypes.h"
+#include "efefGlobals.h"
 
 namespace efef
 {

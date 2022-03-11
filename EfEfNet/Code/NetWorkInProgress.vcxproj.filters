@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Public\Streams">
       <UniqueIdentifier>{d955ca53-2021-4bd6-94e0-dc30e5c5ddc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Public\Core">
+      <UniqueIdentifier>{6ca18692-d6de-4842-b202-28b7c286d0cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Public\SocketSupport">
+      <UniqueIdentifier>{e06a5937-955d-4002-bf4e-c71df2c1be40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -32,12 +38,6 @@
     </ClCompile>
     <ClCompile Include="efefDebug.cpp">
       <Filter>Source Files\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="efefGlobal.cpp">
-      <Filter>Source Files\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="efefSocketAddr.cpp">
-      <Filter>Source Files\Public</Filter>
     </ClCompile>
     <ClCompile Include="efefSocket.cpp">
       <Filter>Source Files\Public\Sockets</Filter>
@@ -48,31 +48,31 @@
     <ClCompile Include="efefTCPSocket.cpp">
       <Filter>Source Files\Public\Sockets</Filter>
     </ClCompile>
-    <ClCompile Include="efefGeneral.cpp">
-      <Filter>Source Files\Public</Filter>
-    </ClCompile>
     <ClCompile Include="efefInputStream.cpp">
       <Filter>Source Files\Public\Streams</Filter>
     </ClCompile>
     <ClCompile Include="efefOutputStream.cpp">
       <Filter>Source Files\Public\Streams</Filter>
     </ClCompile>
+    <ClCompile Include="efefPrivateGlobals.cpp">
+      <Filter>Source Files\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="efefGlobals.cpp">
+      <Filter>Source Files\Public\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="efefGeneral.cpp">
+      <Filter>Source Files\Public\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="efefSocketAddr.cpp">
+      <Filter>Source Files\Public\SocketSupport</Filter>
+    </ClCompile>
+    <ClCompile Include="efefSocketSet.cpp">
+      <Filter>Source Files\Public\SocketSupport</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="efefDebug.h">
       <Filter>Source Files\Private</Filter>
-    </ClInclude>
-    <ClInclude Include="efefGlobal.h">
-      <Filter>Source Files\Private</Filter>
-    </ClInclude>
-    <ClInclude Include="efefNet.h">
-      <Filter>Source Files\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="efefSocketAddr.h">
-      <Filter>Source Files\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="efefTypes.h">
-      <Filter>Source Files\Public</Filter>
     </ClInclude>
     <ClInclude Include="efefSocket.h">
       <Filter>Source Files\Public\Sockets</Filter>
@@ -83,9 +83,6 @@
     <ClInclude Include="efefTCPSocket.h">
       <Filter>Source Files\Public\Sockets</Filter>
     </ClInclude>
-    <ClInclude Include="efefGeneral.h">
-      <Filter>Source Files\Public</Filter>
-    </ClInclude>
     <ClInclude Include="efefInputStream.h">
       <Filter>Source Files\Public\Streams</Filter>
     </ClInclude>
@@ -94,6 +91,24 @@
     </ClInclude>
     <ClInclude Include="efefStreams.h">
       <Filter>Source Files\Public\Streams</Filter>
+    </ClInclude>
+    <ClInclude Include="efefPrivateGlobals.h">
+      <Filter>Source Files\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="efefGlobals.h">
+      <Filter>Source Files\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="efefNet.h">
+      <Filter>Source Files\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="efefGeneral.h">
+      <Filter>Source Files\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="efefSocketAddr.h">
+      <Filter>Source Files\Public\SocketSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="efefSocketSet.h">
+      <Filter>Source Files\Public\SocketSupport</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

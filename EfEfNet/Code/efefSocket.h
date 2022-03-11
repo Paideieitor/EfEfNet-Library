@@ -1,6 +1,6 @@
 #pragma once
 
-#include "efefTypes.h"
+#include "efefGlobals.h"
 
 namespace efef
 {
@@ -12,17 +12,17 @@ namespace efef
 
 		virtual ~efef_socket();
 
-		int Bind(socket_addr&);
-		int Bind(socket_addr&&);
+		int bind(socket_addr&);
+		int bind(socket_addr&&);
 
-		bool IsBlocking();
-		int SetBlocking(bool enable);
+		bool is_blocking();
+		int set_blocking(bool enable);
 
 	protected:
 
 		efef_socket(uint efef_socket);
 
 		uint mSocket;
-		bool blocking;
+		bool mBlocking;
 	};
 }

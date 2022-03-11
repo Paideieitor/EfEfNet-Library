@@ -1,6 +1,6 @@
 #pragma once
 
-#include "efefTypes.h"
+#include "efefGlobals.h"
 
 namespace efef
 {
@@ -13,49 +13,49 @@ namespace efef
 		~ostream();
 
 		template <class T>
-		T GetVar()
+		T get_var()
 		{
 			byte data[sizeof(T)];
 
-			uint start = current;
-			for (uint i = 0u; i < sizeof(T) && current < size; ++i)
+			uint start = mCurrent;
+			for (uint i = 0u; i < sizeof(T) && mCurrent < mSize; ++i)
 			{
-				data[i] = stream[start + i];
-				++current;
+				data[i] = mStream[start + i];
+				++mCurrent;
 			}
 
 			return *reinterpret_cast<T*>(data);
 		}
 
 		template <class T>
-		T* GetArray(T* array, uint size)
+		T* get_array(T* t, uint tSize)
 		{
-			for (uint i = 0; i < size; ++i)
-				array[i] = GetVar<T>();
+			for (uint i = 0; i < tSize; ++i)
+				t[i] = get_var<T>();
 
-			return array;
+			return t;
 		}
 
 		// This function allocates memory, make sure to release it!
 		template <class T>
-		T* DynamicGetArray(uint size)
+		T* dynm_get_array(uint tSize)
 		{
-			T* array = new T[size];
+			T* t = new T[tSize];
 
-			for (uint i = 0; i < size; ++i)
-				array[i] = GetVar<T>();
+			for (uint i = 0; i < tSize; ++i)
+				t[i] = get_var<T>();
 
-			return array;
+			return t;
 		}
 
-		uint Size() const;
+		uint size() const;
 
 		bool dispose;
 
 	private:
 
-		uint current;
-		uint size;
-		const byte* const stream;
+		uint mCurrent;
+		uint mSize;
+		const byte* const mStream;
 	};
 }

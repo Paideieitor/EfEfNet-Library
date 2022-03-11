@@ -1,6 +1,6 @@
 #pragma once
 
-#include "efefTypes.h"
+#include "efefGlobals.h"
 
 namespace efef
 {
@@ -12,32 +12,30 @@ namespace efef
 		~istream();
 
 		template <class T>
-		void PushVar(T t)
+		void push_var(T t)
 		{
 			byte* bytes = reinterpret_cast<byte*>(&t);
 			for (uint i = 0u; i < sizeof(T); ++i)
-				Push(bytes[i]);
+				push(bytes[i]);
 		}
 
 		template <class T>
-		void PushArray(T t, uint size)
+		void push_array(T t, uint tSize)
 		{
-			for (uint i = 0u; i < size; ++i)
-				PushVar(t[i]);
+			for (uint i = 0u; i < tSize; ++i)
+				push_var(t[i]);
 		}
 
-		const uint Size() const;
+		const uint size() const;
 
-		const byte* const Buffer() const;
+		const byte* const get_buffer() const;
 
 	private:
 
-		void Push(const byte& b);
+		void push(const byte& b);
 
-		void Expand();
-
-		uint size;
-		uint capacity;
-		byte* stream;
+		uint mSize;
+		uint mCapacity;
+		byte* mStream;
 	};
 }
