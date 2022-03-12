@@ -26,9 +26,9 @@ namespace efef
 
 	enum select_mode
 	{
-		SEND,
 		RECEIVE,
-		ERROR
+		SEND,
+		EXCEPT
 	};
 
 	template <class T>

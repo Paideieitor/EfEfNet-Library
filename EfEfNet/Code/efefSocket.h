@@ -24,5 +24,7 @@ namespace efef
 
 		uint mSocket;
 		bool mBlocking;
+
+		friend class priv_util;
 	};
 }

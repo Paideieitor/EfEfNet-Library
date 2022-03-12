@@ -8,9 +8,9 @@ namespace efef
 	{
     public:
 
-        int send_to(const byte* data, int dataLength, socket_addr& receiver);
-        int send_to(const byte* data, int dataLength, socket_addr&& receiver);
-        int receive_from(byte* buffer, int bufferLength, socket_addr& sender);
+        int send_to(const byte* data, int dataLength, socket_addr& receiver) const;
+        int send_to(const byte* data, int dataLength, socket_addr&& receiver) const;
+        int receive_from(byte* buffer, int bufferLength, socket_addr& sender) const;
 
     private:
 

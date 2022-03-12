@@ -1,7 +1,6 @@
 #include "efefGeneral.h"
 
 #include "efefPrivateGlobals.h"
-#include "efefDebug.h"
 
 int efef::Init()
 {
@@ -72,3 +71,49 @@ efef::tcp_socket efef::CreateTCPSocket(address_family family)
 
     return tcp_socket(newSocket);
 }
+
+int efef::Poll(const udp_socket* socket, select_mode mode, long millisec)
+{
+    udp_set set;
+    set.add(socket);
+
+    int error = priv_util::Select(&set, mode, millisec);
+    if (error < 0)
+        return EFEF_ERROR;
+
+    return set.size();
+}
+
+int efef::Select(udp_set* const sockets, select_mode mode, long millisec)
+{
+    return priv_util::Select(sockets, mode, millisec);
+}
+
+int efef::Select(udp_set* const receive, udp_set* const send, udp_set* const except, long millisec)
+{
+    return priv_util::Select(receive, send, except, millisec);
+}
+
+int efef::Poll(const tcp_socket* socket, select_mode mode, long millisec)
+{
+    tcp_set set;
+    set.add(socket);
+
+    int error = priv_util::Select(&set, mode, millisec);
+    if (error != 0)
+        return EFEF_ERROR;
+
+    return set.size();
+}
+
+int efef::Select(tcp_set* const sockets, select_mode mode, long millisec)
+{
+    return priv_util::Select(sockets, mode, millisec);
+}
+
+int efef::Select(tcp_set* const receive, tcp_set* const send, tcp_set* const except, long millisec)
+{
+    return priv_util::Select(receive, send, except, millisec);
+}
+
+

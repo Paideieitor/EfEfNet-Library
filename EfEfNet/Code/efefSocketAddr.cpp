@@ -1,7 +1,6 @@
 #include "efefSocketAddr.h"
 
 #include "efefPrivateGlobals.h"
-#include "efefDebug.h"
 
 efef::socket_addr::socket_addr()
 {

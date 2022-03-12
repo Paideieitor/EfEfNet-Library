@@ -1,11 +1,10 @@
 #include "efefSocket.h"
 
 #include "efefPrivateGlobals.h"
-#include "efefDebug.h"
 
 #include "efefSocketAddr.h"
 
-efef::efef_socket::efef_socket(uint efef_socket) : mSocket(efef_socket), mBlocking(false) {}
+efef::efef_socket::efef_socket(uint efef_socket) : mSocket(efef_socket), mBlocking(true) {}
 
 efef::efef_socket::~efef_socket()
 {

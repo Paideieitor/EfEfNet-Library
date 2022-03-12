@@ -28,6 +28,8 @@ namespace efef
 			--mSize;
 		}
 
+		void clear() { mSize = 0u; }
+
 		uint size() const { return mSize; }
 		uint capacity() const { return mCapacity; }
 
@@ -40,6 +42,6 @@ namespace efef
 		T* mData;
 	};
 
-	typedef set<udp_socket* const> udp_set;
-	typedef set<tcp_socket* const> tcp_set;
+	typedef set<const udp_socket*> udp_set;
+	typedef set<const tcp_socket*> tcp_set;
 }
