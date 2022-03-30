@@ -4,7 +4,7 @@
 
 #include "efefSocketAddr.h"
 
-efef::tcp_socket::tcp_socket(uint efef_socket) : efef_socket(efef_socket) {}
+efef::tcp_socket::tcp_socket(uint socket) : efef_socket(socket) {}
 
 int efef::tcp_socket::connect(socket_addr& address)
 {

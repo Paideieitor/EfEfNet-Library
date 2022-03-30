@@ -19,7 +19,7 @@ namespace efef
 
     private:
 
-        tcp_socket(uint efef_socket);
+        tcp_socket(uint socket);
 
         friend tcp_socket CreateTCPSocket(address_family);
     };

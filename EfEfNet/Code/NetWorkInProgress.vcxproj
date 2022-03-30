@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="efefDebug.h" />
+    <ClInclude Include="efefFastSocket.h" />
     <ClInclude Include="efefPrivateGlobals.h" />
     <ClInclude Include="efefInputStream.h" />
     <ClInclude Include="efefNet.h" />

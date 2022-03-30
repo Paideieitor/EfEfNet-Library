@@ -4,7 +4,7 @@
 
 #include "efefSocketAddr.h"
 
-efef::efef_socket::efef_socket(uint efef_socket) : mSocket(efef_socket), mBlocking(true) {}
+efef::efef_socket::efef_socket(uint socket) : mSocket(socket), mBlocking(true) {}
 
 efef::efef_socket::~efef_socket()
 {

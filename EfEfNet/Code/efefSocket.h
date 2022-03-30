@@ -20,7 +20,7 @@ namespace efef
 
 	protected:
 
-		efef_socket(uint efef_socket);
+		efef_socket(uint socket);
 
 		uint mSocket;
 		bool mBlocking;

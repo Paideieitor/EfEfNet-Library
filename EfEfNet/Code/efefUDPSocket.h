@@ -14,7 +14,7 @@ namespace efef
 
     private:
 
-        udp_socket(uint efef_socket);
+        udp_socket(uint socket);
 
         friend udp_socket CreateUDPSocket(address_family);
 	};

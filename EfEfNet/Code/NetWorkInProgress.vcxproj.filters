@@ -110,5 +110,8 @@
     <ClInclude Include="efefSocketSet.h">
       <Filter>Source Files\Public\SocketSupport</Filter>
     </ClInclude>
+    <ClInclude Include="efefFastSocket.h">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

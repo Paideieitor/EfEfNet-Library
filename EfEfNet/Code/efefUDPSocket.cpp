@@ -4,7 +4,7 @@
 
 #include "efefSocketAddr.h"
 
-efef::udp_socket::udp_socket(uint efef_socket) : efef_socket(efef_socket) {}
+efef::udp_socket::udp_socket(uint socket) : efef_socket(socket) {}
 
 int efef::udp_socket::send_to(const byte* data, int dataLength, socket_addr& receiver) const
 {
