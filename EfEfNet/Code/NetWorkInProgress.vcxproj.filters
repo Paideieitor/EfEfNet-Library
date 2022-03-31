@@ -69,6 +69,9 @@
     <ClCompile Include="efefSocketSet.cpp">
       <Filter>Source Files\Public\SocketSupport</Filter>
     </ClCompile>
+    <ClCompile Include="efefFastSocket.cpp">
+      <Filter>Source Files\Public\Sockets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="efefDebug.h">

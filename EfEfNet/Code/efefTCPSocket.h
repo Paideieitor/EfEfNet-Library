@@ -8,14 +8,14 @@ namespace efef
     {
     public:
 
-        int connect(socket_addr& address);
-        int connect(socket_addr&& address);
+        int connect(socket_addr& address) const;
+        int connect(socket_addr&& address) const;
 
-        int listen(int backLog = 0x7fffffff);
-        tcp_socket accept(socket_addr& fromAddress);
+        int listen(int backLog = 0x7fffffff) const;
+        tcp_socket accept(socket_addr& fromAddress) const;
 
-        int send(const byte* data, int dataLength);
-        int receive(byte* buffer, int bufferLength);
+        int send(const byte* data, int dataLength) const;
+        int receive(byte* buffer, int bufferLength) const;
 
     private:
 
@@ -24,4 +24,3 @@ namespace efef
         friend tcp_socket CreateTCPSocket(address_family);
     };
 }
-

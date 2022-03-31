@@ -6,6 +6,7 @@
 
 namespace efef
 {
+    typedef efef::set<socket_addr> addr_set;
 
 	class fast_socket : public efef_socket
 	{
@@ -14,23 +15,43 @@ namespace efef
         enum acces_state
         {
             PUBLIC,
-            ACCES_LIST,
-            BAN_LIST
+            PRIVATE
         };
 
-        int send();
-        int send_to();
-        int receive();
-        int receive_from();
+        void connect(const socket_addr& addr);
+        void accept(socket_addr& addr);
+
+        void give_acces(const socket_addr& addr);
+        void ban(const socket_addr& addr);
+
+        int send(const byte* data, int dataLength);
+        int receive(byte* buffer, int bufferLength, socket_addr& sender);
 
         acces_state accesState = PUBLIC;
 
     private:
 
+        struct Message
+        {
+            enum messageType
+            {
+                CONNECT,
+                ACCEPT,
+                MESSAGE,
+                ACKNOWLEDGE,
+                DISCONNECT
+            };
+        };
+
         fast_socket(uint socket);
 
-        socket_addr mAddress;
-        efef::set<socket_addr> list;
+        int send_message(const byte* data, int dataLength, socket_addr& receiver) const;
+        int receive_message(const byte* buffer, int bufferLength, socket_addr& sender) const;
+
+        addr_set accesList;
+        addr_set banList;
+
+        uint currentID = 0u;
 
         friend fast_socket CreateFastSocket(address_family);
 	};

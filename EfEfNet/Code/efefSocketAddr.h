@@ -28,5 +28,6 @@ namespace efef
         friend class efef_socket;
         friend class udp_socket;
         friend class tcp_socket;
+        friend class fast_socket;
 	};
 }

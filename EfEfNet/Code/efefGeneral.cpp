@@ -49,7 +49,7 @@ efef::udp_socket efef::CreateUDPSocket(address_family family)
     if (newSocket == INVALID_SOCKET)
         return efef::DebugError("Create UDP Socket Error");
 
-    return udp_socket(newSocket);
+    return udp_socket((uint)newSocket);
 }
 
 efef::tcp_socket efef::CreateTCPSocket(address_family family)
@@ -69,7 +69,7 @@ efef::tcp_socket efef::CreateTCPSocket(address_family family)
     if (newSocket == INVALID_SOCKET)
         return efef::DebugError("Create TCP Socket Error");
 
-    return tcp_socket(newSocket);
+    return tcp_socket((uint)newSocket);
 }
 
 int efef::Poll(const udp_socket* socket, select_mode mode, long millisec)
