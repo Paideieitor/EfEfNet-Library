@@ -45,7 +45,7 @@ int efef::fast_socket::receive_message(const byte* buffer, int bufferLength, soc
 	int bytesRead = recvfrom(mSocket, (char*)buffer, bufferLength, 0, efef::GetAddress(sender.mAddress), &senderLength);
 
 	if (bytesRead < 0)
-		return efef::DebugError("UDP Socket Recieve From Error");
+		return efef::DebugError("Fast Socket Recieve Message From Error");
 
 	return bytesRead;
 }
