@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="efefDebug.cpp" />
+    <ClCompile Include="efefFastSocket.cpp" />
     <ClCompile Include="efefGlobals.cpp" />
     <ClCompile Include="efefPrivateGlobals.cpp" />
     <ClCompile Include="efefGeneral.cpp" />

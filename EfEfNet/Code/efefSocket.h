@@ -12,8 +12,8 @@ namespace efef
 
 		virtual ~efef_socket();
 
-		int bind(socket_addr&);
-		int bind(socket_addr&&);
+		virtual int bind(socket_addr&);
+		virtual int bind(socket_addr&&);
 
 		bool is_blocking();
 		int set_blocking(bool enable);

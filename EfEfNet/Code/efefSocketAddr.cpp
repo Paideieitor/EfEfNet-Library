@@ -46,3 +46,11 @@ efef::socket_addr::socket_addr(wstr presentation, const ushort port)
         break;
     }
 }
+
+bool efef::socket_addr::operator==(const socket_addr& addr) const
+{
+    for (uint i = 0; i < ADDR_SIZE; ++i)
+        if (mAddress[i] != addr.mAddress[i])
+            return false;
+    return true;
+}

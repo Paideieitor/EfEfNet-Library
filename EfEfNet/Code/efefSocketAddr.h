@@ -21,6 +21,8 @@ namespace efef
         // passing a string presentation of the ip address and a port creates an AF_INET efef_socket
         socket_addr(wstr presentation, const ushort port);
 
+        bool operator== (const socket_addr& addr) const;
+
     private:
 
         address mAddress;
@@ -28,5 +30,6 @@ namespace efef
         friend class efef_socket;
         friend class udp_socket;
         friend class tcp_socket;
+        friend class fast_socket;
 	};
 }
