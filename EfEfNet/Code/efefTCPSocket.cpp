@@ -6,7 +6,7 @@
 
 efef::tcp_socket::tcp_socket(uint socket) : efef_socket(socket) {}
 
-int efef::tcp_socket::connect(socket_addr& address)
+int efef::tcp_socket::connect(socket_addr& address) const
 {
     int error = ws2connect(mSocket, efef::GetAddress(address.mAddress), ADDR_SIZE);
 
@@ -16,7 +16,7 @@ int efef::tcp_socket::connect(socket_addr& address)
     return EFEF_NO_ERROR;
 }
 
-int efef::tcp_socket::connect(socket_addr&& address)
+int efef::tcp_socket::connect(socket_addr&& address) const
 {
     int error = ws2connect(mSocket, efef::GetAddress(address.mAddress), ADDR_SIZE);
 
@@ -26,7 +26,7 @@ int efef::tcp_socket::connect(socket_addr&& address)
     return EFEF_NO_ERROR;
 }
 
-int efef::tcp_socket::listen(int backLog)
+int efef::tcp_socket::listen(int backLog) const
 {
     int error = ws2listen(mSocket, backLog);
     
@@ -36,7 +36,7 @@ int efef::tcp_socket::listen(int backLog)
     return EFEF_NO_ERROR;
 }
 
-efef::tcp_socket efef::tcp_socket::accept(socket_addr& fromAddress)
+efef::tcp_socket efef::tcp_socket::accept(socket_addr& fromAddress) const
 {
     int fromLength = ADDR_SIZE;
     SOCKET newSocket = ws2accept(mSocket, efef::GetAddress(fromAddress.mAddress), &fromLength);
@@ -47,7 +47,7 @@ efef::tcp_socket efef::tcp_socket::accept(socket_addr& fromAddress)
     return efef::DebugError("TCP Socket Accept Error");
 }
 
-int efef::tcp_socket::send(const byte* data, int dataLength)
+int efef::tcp_socket::send(const byte* data, int dataLength) const
 {
     int bytesSent = ws2send(mSocket, (const char*)data, dataLength, 0);
 
@@ -57,7 +57,7 @@ int efef::tcp_socket::send(const byte* data, int dataLength)
     return bytesSent;
 }
 
-int efef::tcp_socket::receive(byte* buffer, int bufferLength)
+int efef::tcp_socket::receive(byte* buffer, int bufferLength) const
 {
     int bytesRecv = recv(mSocket, (char*)buffer, bufferLength, 0);
 
