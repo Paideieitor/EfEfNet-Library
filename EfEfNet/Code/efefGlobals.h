@@ -43,4 +43,7 @@ namespace efef
 		src = dest;
 		srcCapacity *= 2;
 	}
+
+	void memory_set(void* src, byte value, uint amount);
+	void memory_copy(void* src, void* dest, uint amount);
 }

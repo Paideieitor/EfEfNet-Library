@@ -9,6 +9,7 @@ namespace efef
 	public:
 
 		istream();
+		istream(const istream&);
 		~istream();
 
 		template <class T>
@@ -29,6 +30,8 @@ namespace efef
 		const uint size() const;
 
 		const byte* const get_buffer() const;
+
+		void clear(bool flush = false);
 
 	private:
 

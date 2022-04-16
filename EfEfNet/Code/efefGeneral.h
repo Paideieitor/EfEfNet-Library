@@ -1,9 +1,15 @@
 #pragma once
 
-#include "efefSocketSet.h"
+#include "efefUDPSocket.h"
+#include "efefTCPSocket.h"
+#include "efefFastSocket.h"
 
 namespace efef
 {
+	typedef set<const udp_socket*> udp_set;
+	typedef set<const tcp_socket*> tcp_set;
+	typedef set<const fast_socket*> fast_set;
+
 	int Init();
 	int CleanUp();
 

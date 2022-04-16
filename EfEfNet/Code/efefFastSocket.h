@@ -3,10 +3,12 @@
 #include "efefSocket.h"
 #include "efefSocketAddr.h"
 #include "efefSocketSet.h"
+#include "efefInputStream.h"
+
+#define RECVID_SIZE 16
 
 namespace efef
 {
-
 	class fast_socket : public efef_socket
 	{
     public:
@@ -24,7 +26,7 @@ namespace efef
         int connect(socket_addr& address);
         fast_socket accept(socket_addr& fromAddress);
 
-        int send(const byte* data, int dataLength);
+        void send(const byte* data, int dataLength);
         int receive(byte* buffer, int bufferLength);
 
         void add_to_list(const socket_addr& fromAddress);
@@ -33,14 +35,39 @@ namespace efef
 
         void erase_list();
 
+        void update();
+
         acces_state accesState = PUBLIC;
 
     private:
 
-        uint next_id = 0u;
-        uint recv_ids[16];
+        enum message_type
+        {
+            NULL,
+            MESSAGE,
+            CONNECT,
+            ACCEPT,
+            DISCONNECT
+        };
+
+        struct message
+        {
+            message_type type;
+            uint ID;
+            byte* data;
+
+            message() : type(message_type::NULL), ID(0u), data(nullptr) {}
+            message(message_type type, uint ID, byte* data) : type(type), ID(ID), data(data) {}
+        };
 
         fast_socket(uint socket);
+
+        void send_message();
+
+        uint next_id;
+        uint recv_ids[RECVID_SIZE];
+
+        istream to_send;
 
         socket_addr mAddress;
         efef::set<socket_addr> recvList;

@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="efefDebug.cpp" />
+    <ClCompile Include="efefManager.cpp" />
     <ClCompile Include="efefFastSocket.cpp" />
     <ClCompile Include="efefGlobals.cpp" />
     <ClCompile Include="efefPrivateGlobals.cpp" />
@@ -155,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="efefDebug.h" />
+    <ClInclude Include="efefManager.h" />
     <ClInclude Include="efefFastSocket.h" />
     <ClInclude Include="efefPrivateGlobals.h" />
     <ClInclude Include="efefInputStream.h" />

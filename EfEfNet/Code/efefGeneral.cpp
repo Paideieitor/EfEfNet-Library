@@ -1,6 +1,7 @@
 #include "efefGeneral.h"
 
 #include "efefPrivateGlobals.h"
+#include "efefManager.h"
 
 int efef::Init()
 {
@@ -17,6 +18,9 @@ int efef::Init()
         return efef::DebugError("Version Error");
     }
 
+    if (efef::manager::inst == nullptr)
+        efef::manager::inst = new manager();
+
     return EFEF_NO_ERROR;
 }
 
@@ -24,6 +28,10 @@ int efef::CleanUp()
 {
     if (WSACleanup() == SOCKET_ERROR)
         return efef::DebugError("Clean Up Error");
+
+    delete efef::manager::inst;
+    efef::manager::inst = nullptr;
+
     return EFEF_NO_ERROR;
 }
 

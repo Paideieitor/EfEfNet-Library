@@ -1,9 +1,5 @@
 #pragma once
 
-#include "efefUDPSocket.h"
-#include "efefTCPSocket.h"
-#include "efefFastSocket.h"
-
 namespace efef
 {
 	template <class T>
@@ -42,8 +38,4 @@ namespace efef
 		uint mCapacity;
 		T* mData;
 	};
-
-	typedef set<const udp_socket*> udp_set;
-	typedef set<const tcp_socket*> tcp_set;
-	typedef set<const fast_socket*> fast_set;
 }

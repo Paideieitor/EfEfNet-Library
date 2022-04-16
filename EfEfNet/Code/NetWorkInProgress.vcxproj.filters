@@ -72,6 +72,9 @@
     <ClCompile Include="efefFastSocket.cpp">
       <Filter>Source Files\Public\Sockets</Filter>
     </ClCompile>
+    <ClCompile Include="efefManager.cpp">
+      <Filter>Source Files\Public\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="efefDebug.h">
@@ -115,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="efefFastSocket.h">
       <Filter>Source Files\Public\Sockets</Filter>
+    </ClInclude>
+    <ClInclude Include="efefManager.h">
+      <Filter>Source Files\Public\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
