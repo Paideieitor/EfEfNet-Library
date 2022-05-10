@@ -2,10 +2,12 @@
 
 #include "efefPrivateGlobals.h"
 #include "efefInputStream.h"
+#include "efefManager.h"
 
 efef::fast_socket::fast_socket(uint socket) : efef_socket(socket), next_id(0u) 
 {
     efef::memory_set(recv_ids, 0, RECVID_SIZE);
+    efef::manager::instance()->sockets.add(this);
 }
 
 int efef::fast_socket::bind(socket_addr& addr)
@@ -81,7 +83,7 @@ void efef::fast_socket::send_message()
 {
     int bytesSent = sendto(mSocket, (const char*)to_send.get_buffer(), to_send.size(), 0, efef::GetAddress(mAddress.mAddress), ADDR_SIZE);
 
-    if (bytesSent < to_send.size())
+    if (bytesSent < (int)to_send.size())
         efef::DebugError("Fast Socket Send Message To Error");
 
     to_send.clear();

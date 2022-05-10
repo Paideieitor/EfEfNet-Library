@@ -42,7 +42,7 @@ efef::tcp_socket efef::tcp_socket::accept(socket_addr& fromAddress) const
     SOCKET newSocket = ws2accept(mSocket, efef::GetAddress(fromAddress.mAddress), &fromLength);
 
     if (newSocket != INVALID_SOCKET)
-        return tcp_socket(newSocket);
+        return tcp_socket((uint)newSocket);
 
     return efef::DebugError("TCP Socket Accept Error");
 }

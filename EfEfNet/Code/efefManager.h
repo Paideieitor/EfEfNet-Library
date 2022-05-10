@@ -8,7 +8,7 @@ namespace efef
 	{
 	public:
 
-		static const manager* const instance();
+		static manager* const instance();
 
 		void update();
 

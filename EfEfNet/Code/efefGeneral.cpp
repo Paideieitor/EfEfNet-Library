@@ -97,10 +97,10 @@ efef::fast_socket efef::CreateFastSocket(address_family family)
     if (newSocket == INVALID_SOCKET)
         return efef::DebugError("Create Fast Socket Error");
 
-    return fast_socket(newSocket);
+    return fast_socket((uint)newSocket);
 }
 
-int efef::Poll(const udp_socket* socket, select_mode mode, long millisec)
+int efef::Poll(udp_socket* const socket, select_mode mode, long millisec)
 {
     udp_set set;
     set.add(socket);
@@ -122,7 +122,7 @@ int efef::Select(udp_set* const receive, udp_set* const send, udp_set* const exc
     return priv_util::Select(receive, send, except, millisec);
 }
 
-int efef::Poll(const tcp_socket* socket, select_mode mode, long millisec)
+int efef::Poll(tcp_socket* const socket, select_mode mode, long millisec)
 {
     tcp_set set;
     set.add(socket);
