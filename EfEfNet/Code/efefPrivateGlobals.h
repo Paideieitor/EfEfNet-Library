@@ -44,6 +44,18 @@ namespace efef
 					tSockets->erase(i);
 		}
 
+		static bool ReceivePoll(SOCKET socket)
+		{
+			int output = 0;
+
+			fd_set set;
+			FD_ZERO(&set);
+			FD_SET(socket, &set);
+
+			timeval* waitPtr = nullptr;
+			return (bool)select(0, &set, nullptr, nullptr, waitPtr);
+		}
+
 		template <class T>
 		static int Select(T* const sockets, select_mode mode, long millisec)
 		{

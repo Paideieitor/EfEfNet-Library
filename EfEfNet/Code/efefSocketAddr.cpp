@@ -2,12 +2,32 @@
 
 #include "efefPrivateGlobals.h"
 
-efef::socket_addr::socket_addr()
+efef::socket_addr::socket_addr(const uint u)
 {
-    memset(mAddress, 0, ADDR_SIZE);
+    fill(u);
 }
 
 efef::socket_addr::socket_addr(const ulong address, const ushort port)
+{
+    fill(address, port);
+}
+
+efef::socket_addr::socket_addr(const int b1, const int b2, const int b3, const int b4, const ushort port)
+{
+    fill(b1, b2, b3, b4, port);
+}
+
+efef::socket_addr::socket_addr(wstr presentation, const ushort port)
+{
+    fill(presentation, port);
+}
+
+void efef::socket_addr::fill(const uint u)
+{
+    memory_set(mAddress, u, ADDR_SIZE);
+}
+
+void efef::socket_addr::fill(const ulong address, const ushort port)
 {
     sockaddr_in* inAddress = efef::GetIPv4(mAddress);
 
@@ -16,7 +36,7 @@ efef::socket_addr::socket_addr(const ulong address, const ushort port)
     inAddress->sin_port = htons(port);
 }
 
-efef::socket_addr::socket_addr(const int b1, const int b2, const int b3, const int b4, const ushort port)
+void efef::socket_addr::fill(const int b1, const int b2, const int b3, const int b4, const ushort port)
 {
     sockaddr_in* inAddress = efef::GetIPv4(mAddress);
 
@@ -29,7 +49,7 @@ efef::socket_addr::socket_addr(const int b1, const int b2, const int b3, const i
     inAddress->sin_addr.S_un.S_un_b.s_b4 = b4;
 }
 
-efef::socket_addr::socket_addr(wstr presentation, const ushort port)
+void efef::socket_addr::fill(wstr presentation, const ushort port)
 {
     sockaddr_in* inAddress = efef::GetIPv4(mAddress);
 
@@ -53,4 +73,12 @@ bool efef::socket_addr::operator==(const socket_addr& addr) const
         if (mAddress[i] != addr.mAddress[i])
             return false;
     return true;
+}
+
+bool efef::socket_addr::operator==(const bool& active) const
+{
+    for (uint i = 0; i < ADDR_SIZE; ++i)
+        if (mAddress[i] != 0)
+            return active;
+    return !active;
 }

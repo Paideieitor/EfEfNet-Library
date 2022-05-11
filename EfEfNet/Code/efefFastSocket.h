@@ -13,41 +13,19 @@ namespace efef
 	{
     public:
 
-        enum acces_state
+        enum access_state
         {
             PUBLIC,
-            ACCES_LIST,
+            ACCESS_LIST,
             BAN_LIST
         };
 
-        int bind(socket_addr&);
-        int bind(socket_addr&&);
-
-        int connect(socket_addr& address);
-        fast_socket accept(socket_addr& fromAddress);
-
-        void send(const byte* data, int dataLength);
-        int receive(byte* buffer, int bufferLength);
-
-        void add_to_list(const socket_addr& fromAddress);
-        void erase_from_list(const socket_addr& fromAddress);
-        void erase_from_list(uint index);
-
-        void erase_list();
-
-        void update();
-
-        acces_state accesState = PUBLIC;
-
-    private:
-
         enum message_type
         {
-            NULL,
+            EMPTY,
             MESSAGE,
-            CONNECT,
-            ACCEPT,
-            DISCONNECT
+            DISCONNECT,
+            FAIL
         };
 
         struct message
@@ -55,23 +33,68 @@ namespace efef
             message_type type;
             uint ID;
             byte* data;
+            uint size;
+            ulong time;
 
-            message() : type(message_type::NULL), ID(0u), data(nullptr) {}
-            message(message_type type, uint ID, byte* data) : type(type), ID(ID), data(data) {}
+            message() : type(message_type::EMPTY), ID(0u), data(nullptr), size(0u), time(0l) {}
+            void destroy() 
+            {
+                type = EMPTY;
+                ID = 0u;
+                delete[] data;
+                size = 0u;
+                time = 0l;
+            }
         };
+
+        int bind(socket_addr&) override;
+        int bind(socket_addr&&) override;
+
+        void send(const byte* data, uint dataLength);
+        // WARNING: messages on the set must be destroyed to free their memory, use the destroy() member fuction 
+        efef::set<message> receive();
+
+        void disconnect();
+
+        void add_to_list(const socket_addr& fromAddress);
+        void erase_from_list(const socket_addr& fromAddress);
+        void erase_from_list(uint index);
+
+        void erase_list();
+
+        access_state accessState = PUBLIC;
+        uint listen_backlog = 5u;
+        ulong send_rate_time = 10l;
+        ulong resend_wait_time = 200l;
+
+        socket_addr mRemote;
+
+    private:
 
         fast_socket(uint socket);
 
+        void update();
+
+        void send_ID(uint ID);
+        void resend(message& msg);
         void send_message();
+        void receive_message();
+        void disconnect_socket();
 
-        uint next_id;
-        uint recv_ids[RECVID_SIZE];
+        // Send
+        uint nextID; // IDs start at 10 (0-9 reserved numbers)
+        istream toSend;
+        ulong lastSentTime;
 
-        istream to_send;
+        // Receive
+        efef::set<message> unaknowledged;
+        efef::set<message> messages;
 
+        // General
         socket_addr mAddress;
         efef::set<socket_addr> recvList;
 
         friend fast_socket CreateFastSocket(address_family);
+        friend class manager;
 	};
 }

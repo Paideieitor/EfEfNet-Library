@@ -7,10 +7,10 @@ namespace efef
 	{
 	public:
 
-		set() : mSize(0u), mCapacity(2u), mData(new T[mCapacity]) {}
+		set(uint capacity = 0u) : mSize(0u), mCapacity(capacity), mData(new T[mCapacity]) {}
 		~set() { delete mData; }
 
-		void add(T t) 
+		void add(const T& t) 
 		{
 			while (mSize >= mCapacity)
 				expand_array(mData, mCapacity);
@@ -27,10 +27,25 @@ namespace efef
 
 		void clear() { mSize = 0u; }
 
+		void swap(set<T>& set)
+		{
+			uint bSize = mSize;
+			uint bCapacity = mCapacity;
+			T* bData = mData;
+
+			mSize = set.mSize;
+			mCapacity = set.mCapacity;
+			mData = set.mData;
+
+			set.mSize = bSize;
+			set.mCapacity = bCapacity;
+			set.mData = bData;
+		}
+
 		uint size() const { return mSize; }
 		uint capacity() const { return mCapacity; }
 
-		T operator[](uint index) const { return index < mSize ? mData[index] : mData[-1]; }
+		T& operator[](uint index) const { return index < mSize ? mData[index] : mData[-1]; }
 
 	private:
 
