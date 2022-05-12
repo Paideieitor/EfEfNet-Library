@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Public\SocketSupport">
       <UniqueIdentifier>{e06a5937-955d-4002-bf4e-c71df2c1be40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Public\Architectures">
+      <UniqueIdentifier>{0e8fc582-489e-400f-a75f-08927af23373}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -121,6 +124,12 @@
     </ClInclude>
     <ClInclude Include="efefManager.h">
       <Filter>Source Files\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="efefServer.h">
+      <Filter>Source Files\Public\Architectures</Filter>
+    </ClInclude>
+    <ClInclude Include="efefClient.h">
+      <Filter>Source Files\Public\Architectures</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,13 +4,21 @@
 #include "efefInputStream.h"
 #include "efefManager.h"
 
-efef::fast_socket::fast_socket(uint socket) : efef_socket(socket), nextID(10u) 
+efef::fast_socket::fast_socket(uint socket) : efef_socket(socket), nextID(ID_START)
 {
     lastSentTime = GetTickCount();
     mAddress.fill(0u);
     mRemote.fill(0u);
 
     efef::manager::instance()->sockets.add(this);
+}
+
+efef::fast_socket::~fast_socket()
+{
+    for (uint i = 0u; i < messages.size(); ++i)
+        delete[] messages[i].data;
+    for (uint i = 0u; i < unaknowledged.size(); ++i)
+        delete[] unaknowledged[i].data;
 }
 
 int efef::fast_socket::bind(socket_addr& addr)
@@ -33,6 +41,29 @@ int efef::fast_socket::bind(socket_addr&& addr)
 
     mAddress = addr;
     return EFEF_NO_ERROR;
+}
+
+void efef::fast_socket::connect(const socket_addr& remoteAddress)
+{
+    mRemote = remoteAddress;
+}
+
+bool efef::fast_socket::poll(select_mode mode)
+{
+    switch (mode)
+    {
+    case efef::RECEIVE:
+        if (mAddress == true && messages.size() > 0)
+            return true;
+        return false;
+    case efef::SEND:
+        if (mRemote == true && toSend.size() > 0)
+            return true;
+        return false;
+    case efef::EXCEPT:
+        break;
+    }
+    return false;
 }
 
 void efef::fast_socket::send(const byte* data, uint dataLength)
@@ -140,6 +171,24 @@ void efef::fast_socket::update()
     }
 }
 
+void efef::fast_socket::clean_up()
+{
+    nextID = ID_START;
+    toSend.clear(true);
+    lastSentTime = GetTickCount();
+
+    for (uint i = 0u; i < messages.size(); ++i)
+        delete[] messages[i].data;
+    messages.clear(true);
+
+    for (uint i = 0u; i < unaknowledged.size(); ++i)
+        delete[] unaknowledged[i].data;
+    unaknowledged.clear(true);
+
+    recvIDs.clear(true);
+    recvList.clear(true);
+}
+
 void efef::fast_socket::send_ID(uint ID)
 {
     if (toSend.size() == 0u)
@@ -196,7 +245,7 @@ void efef::fast_socket::receive_message()
         efef::DebugError("Fast Socket Recieve Message Access Denied");
 
     uint head = 0;
-    for (uint i = 0; i < (uint)bufferLength; ++i)
+    for (uint i = 0u; i < (uint)bufferLength; ++i)
         if (buffer[i] == '\\')
         {
             uint ID = *reinterpret_cast<uint*>(buffer[head]);
@@ -213,8 +262,17 @@ void efef::fast_socket::receive_message()
                 break;
             default:
                 uint size = i - head;
-                if (size > 0) // NORMAL MESSAGE
+                if (size > 0u) // NORMAL MESSAGE
                 {
+                    for (uint j = 0u; j < recvIDs.size(); ++j)
+                        if (ID == recvIDs[j])
+                        {
+                            ID = 0u;
+                            break;
+                        }
+                    if (ID == 0u)
+                        break;
+
                     message msg;
                     msg.ID = ID;
                     msg.type = MESSAGE;
@@ -222,11 +280,15 @@ void efef::fast_socket::receive_message()
                     msg.data = new byte[msg.size];
                     memory_copy(buffer + head, msg.data, msg.size);
 
+                    if (recvIDs.size() > RECVID_SIZE)
+                        recvIDs.erase(0u);
+                    recvIDs.add(msg.ID);
+
                     messages.add(msg);
                     send_ID(msg.ID);
                 }
                 else // AKNOWLEDGEMENT
-                    for (uint j = 0; j < unaknowledged.size(); ++j)
+                    for (uint j = 0u; j < unaknowledged.size(); ++j)
                         if (ID == unaknowledged[j].ID)
                         {
                             delete[] unaknowledged[j].data;
@@ -238,11 +300,14 @@ void efef::fast_socket::receive_message()
 
             head = i + 1;
         }
+
+    delete[] buffer;
 }
 
 void efef::fast_socket::disconnect_socket()
 {
-    mAddress.fill(0u);
+    mRemote.fill(0u);
+    clean_up();
 
     message msg;
     msg.type = DISCONNECT;

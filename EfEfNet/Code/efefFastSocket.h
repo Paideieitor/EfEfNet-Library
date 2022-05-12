@@ -5,7 +5,8 @@
 #include "efefSocketSet.h"
 #include "efefInputStream.h"
 
-#define RECVID_SIZE 16
+#define RECVID_SIZE 16u
+#define ID_START 10u
 
 namespace efef
 {
@@ -47,8 +48,14 @@ namespace efef
             }
         };
 
+        ~fast_socket();
+
         int bind(socket_addr&) override;
         int bind(socket_addr&&) override;
+
+        void connect(const socket_addr& remoteAddress);
+
+        bool poll(select_mode mode);
 
         void send(const byte* data, uint dataLength);
         // WARNING: messages on the set must be destroyed to free their memory, use the destroy() member fuction 
@@ -67,13 +74,12 @@ namespace efef
         ulong send_rate_time = 10l;
         ulong resend_wait_time = 200l;
 
-        socket_addr mRemote;
-
     private:
 
         fast_socket(uint socket);
 
         void update();
+        void clean_up();
 
         void send_ID(uint ID);
         void resend(message& msg);
@@ -87,11 +93,13 @@ namespace efef
         ulong lastSentTime;
 
         // Receive
-        efef::set<message> unaknowledged;
         efef::set<message> messages;
+        efef::set<message> unaknowledged;
+        efef::set<uint> recvIDs;
 
         // General
         socket_addr mAddress;
+        socket_addr mRemote;
         efef::set<socket_addr> recvList;
 
         friend fast_socket CreateFastSocket(address_family);

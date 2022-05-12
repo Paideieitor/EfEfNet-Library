@@ -25,7 +25,18 @@ namespace efef
 			--mSize;
 		}
 
-		void clear() { mSize = 0u; }
+		void clear(bool flush = false) 
+		{ 
+			if (flush)
+			{
+				delete[] mData;
+
+				mCapacity = 2u;
+				mData = new T[mCapacity];
+			}
+
+			mSize = 0u; 
+		}
 
 		void swap(set<T>& set)
 		{
