@@ -78,6 +78,9 @@
     <ClCompile Include="efefManager.cpp">
       <Filter>Source Files\Public\Core</Filter>
     </ClCompile>
+    <ClCompile Include="efefServer.cpp">
+      <Filter>Source Files\Public\Architectures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="efefDebug.h">
@@ -130,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="efefClient.h">
       <Filter>Source Files\Public\Architectures</Filter>
+    </ClInclude>
+    <ClInclude Include="efefMessage.h">
+      <Filter>Source Files\Public\SocketSupport</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

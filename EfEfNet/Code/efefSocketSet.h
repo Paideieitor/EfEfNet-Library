@@ -10,7 +10,7 @@ namespace efef
 		set(uint capacity = 0u) : mSize(0u), mCapacity(capacity), mData(new T[mCapacity]) {}
 		~set() { delete mData; }
 
-		void add(const T& t) 
+		void add(const T& t)
 		{
 			while (mSize >= mCapacity)
 				expand_array(mData, mCapacity);
@@ -51,6 +51,16 @@ namespace efef
 			set.mSize = bSize;
 			set.mCapacity = bCapacity;
 			set.mData = bData;
+		}
+
+		T at(uint index)
+		{
+			return index < mSize ? mData[index] : mData[-1];
+		}
+
+		T* get_ptr(uint index)
+		{
+			return index < mSize ? mData + index : nullptr;
 		}
 
 		uint size() const { return mSize; }

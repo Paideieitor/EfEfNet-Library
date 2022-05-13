@@ -46,4 +46,5 @@ namespace efef
 
 	void memory_set(void* const dest, byte value, uint amount);
 	void memory_copy(const void* const src, void* const dest, uint amount);
+	bool compare_str(char* str1, char* str2, uint size);
 }

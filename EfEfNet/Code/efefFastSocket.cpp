@@ -4,6 +4,16 @@
 #include "efefInputStream.h"
 #include "efefManager.h"
 
+bool efef::fast_socket::operator==(const bool& active) const
+{
+    fast_socket* fs = const_cast<fast_socket*>(this);
+    char* sck = reinterpret_cast<char*>(fs);
+    for (uint i = 0; i < sizeof(fast_socket); ++i)
+        if (sck[i] != 0)
+            return active;
+    return !active;
+}
+
 efef::fast_socket::fast_socket(uint socket) : efef_socket(socket), nextID(ID_START)
 {
     lastSentTime = GetTickCount();
@@ -94,9 +104,15 @@ void efef::fast_socket::send(const byte* data, uint dataLength)
     unaknowledged.add(msg);
 }
 
-efef::set<efef::fast_socket::message> efef::fast_socket::receive()
+void efef::fast_socket::force_send()
 {
-    efef::set<efef::fast_socket::message> output(messages.capacity());
+    send_message();
+    lastSentTime = GetTickCount();
+}
+
+efef::set<efef::message> efef::fast_socket::receive()
+{
+    efef::set<efef::message> output(messages.capacity());
     output.swap(messages);
 
     return output;
@@ -149,8 +165,7 @@ void efef::fast_socket::update()
         ulong currentTime = GetTickCount();
         if (toSend.size() > 0 && currentTime - lastSentTime >= send_rate_time)
         {
-            send_message();
-            lastSentTime = GetTickCount();
+            force_send();
         }
 
         // RESEND
@@ -196,7 +211,7 @@ void efef::fast_socket::send_ID(uint ID)
     toSend.push_var(ID);
 }
 
-void efef::fast_socket::resend(efef::fast_socket::message& msg)
+void efef::fast_socket::resend(efef::message& msg)
 {
     if (toSend.size() == 0u)
         toSend.push_var("\\");
@@ -227,6 +242,7 @@ void efef::fast_socket::receive_message()
     {
         message msg;
         msg.type = FAIL;
+        msg.sender = sender;
         messages.add(msg);
         efef::DebugError("Fast Socket Recieve Messages Error");
     }
@@ -255,10 +271,10 @@ void efef::fast_socket::receive_message()
             {
             case 0: // DISCONNECT
                 send_ID(1u);
-                disconnect_socket();
+                disconnect_socket(sender);
                 break;
             case 1: // DISCONNECT AKNOWLEDGE
-                disconnect_socket();
+                disconnect_socket(sender);
                 break;
             default:
                 uint size = i - head;
@@ -278,6 +294,7 @@ void efef::fast_socket::receive_message()
                     msg.type = MESSAGE;
                     msg.size = size;
                     msg.data = new byte[msg.size];
+                    msg.sender = sender;
                     memory_copy(buffer + head, msg.data, msg.size);
 
                     if (recvIDs.size() > RECVID_SIZE)
@@ -304,12 +321,13 @@ void efef::fast_socket::receive_message()
     delete[] buffer;
 }
 
-void efef::fast_socket::disconnect_socket()
+void efef::fast_socket::disconnect_socket(socket_addr& sender)
 {
     mRemote.fill(0u);
     clean_up();
 
     message msg;
     msg.type = DISCONNECT;
+    msg.sender = sender;
     messages.add(msg);
 }
