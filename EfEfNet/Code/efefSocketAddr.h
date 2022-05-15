@@ -11,13 +11,10 @@ namespace efef
 	public:
 
         socket_addr(const uint u = 0u);
-
         // passing a 4-bit ip address and a port creates an AF_INET efef_socket
         socket_addr(const ulong address, const ushort port);
-
         // passing a 4 int ip address and a port creates an AF_INET efef_socket
         socket_addr(const int b1, const int b2, const int b3, const int b4, const ushort port);
-
         // passing a string presentation of the ip address and a port creates an AF_INET efef_socket
         socket_addr(wstr presentation, const ushort port);
 

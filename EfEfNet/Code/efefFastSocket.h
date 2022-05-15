@@ -45,11 +45,9 @@ namespace efef
         void erase_list();
 
         access_state accessState = PUBLIC;
-        uint listen_backlog = 5u;
         ulong send_rate_time = 10l;
         ulong resend_wait_time = 200l;
 
-        bool operator== (const fast_socket& socket) const;
         bool operator== (const bool& active) const;
 
     private:

@@ -17,7 +17,6 @@ namespace efef
 			DISCONNECTED,
 			CONNECTED
 		};
-
 		struct client
 		{
 			char* name;
