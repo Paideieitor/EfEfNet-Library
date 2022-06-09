@@ -21,7 +21,7 @@ namespace efef
 		}
 
 		template <class T>
-		void push_array(T t, uint tSize)
+		void push_array(T* t, uint tSize)
 		{
 			for (uint i = 0u; i < tSize; ++i)
 				push_var(t[i]);
@@ -32,6 +32,8 @@ namespace efef
 		const byte* const get_buffer() const;
 
 		void clear(bool flush = false);
+
+		void Print();
 
 	private:
 

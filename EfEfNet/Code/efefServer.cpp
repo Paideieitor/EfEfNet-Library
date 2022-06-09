@@ -1,16 +1,35 @@
 #include "efefServer.h"
 
 #include "efefGeneral.h"
+#include "efefManager.h"
 #include "efefDebug.h"
 #include "efefStreams.h"
 
+efef::server::server() : listen_socket(efef::CreateFastSocket(IPv4))
+{
+	memory_set(sockets, 0u, SERVER_SIZE * sizeof(fast_socket*));
+
+	efef::manager::instance()->servers.add(this);
+}
+
 efef::server::~server()
 {
+	for (uint i = 0u; i < SERVER_SIZE; ++i)
+		delete[] sockets[i];
+
 	for (uint i = 0u; i < clients.size(); ++i)
-	{
 		delete[] clients[i].name;
-		delete[] clients[i].password;
-	}
+	clients.dontDelete = true;
+
+	efef::manager* const manager = efef::manager::instance();
+	uint index = 0u;
+	for (uint i = 0u; i < manager->servers.size(); ++i)
+		if (manager->servers[i] == this)
+		{
+			index = i;
+			break;
+		}
+	efef::manager::instance()->servers.erase(index);
 }
 
 void efef::server::bind(socket_addr& address)
@@ -25,14 +44,14 @@ void efef::server::bind(socket_addr&& address)
 
 int efef::server::send_to(uint ID, byte* data, uint dataLength)
 {
-	sockets[ID].send(data, dataLength);
+	sockets[ID]->send(data, dataLength);
 
 	return EFEF_NO_ERROR;
 }
 
 int efef::server::send_to(const client* const client, byte* data, uint dataLength)
 {
-	sockets[client->ID].send(data, dataLength);
+	sockets[client->ID]->send(data, dataLength);
 
 	return EFEF_NO_ERROR;
 }
@@ -40,7 +59,7 @@ int efef::server::send_to(const client* const client, byte* data, uint dataLengt
 efef::set<const efef::server::client*> efef::server::pendant_clients()
 {
 	set<const client*> output;
-
+	output.dontDelete = true;
 	for (uint i = 0u; i < clients.size(); ++i)
 		if (clients[i].messages.size() > 0u)
 		{
@@ -70,15 +89,10 @@ void efef::server::update()
 			{
 				client cl;
 
-				ostream outStream(messages[i].data, messages[i].size, true);
-				// Server Introduction message type -> register, login, etc.
-				uint type = outStream.get_var<uint>();
+				ostream outStream(messages[i].data, messages[i].size);
 				// Name of the client
 				cl.name_size = outStream.get_var<uint>();
 				cl.name = outStream.dynm_get_array<char>(cl.name_size);
-				// Password of the client
-				cl.pw_size = outStream.get_var<uint>();
-				cl.password = outStream.dynm_get_array<char>(cl.pw_size);
 
 				client* client = nullptr;
 				bool error = false;
@@ -108,21 +122,23 @@ void efef::server::update()
 				client->state = CONNECTED;
 				client->address = messages[i].sender;
 
-				fast_socket socket = efef::CreateFastSocket(IPv4);
+				fast_socket* socket = efef::CreateDynmcFastSocket(IPv4);
 
 				for (uint j = 0u; j < SERVER_SIZE; ++j)
-					if (sockets[j] == false)
+					if (!sockets[j])
 					{
 						sockets[j] = socket;
 						client->ID = j;
+						break;
 					}
 
 				socket_addr bindAddr(L"127.0.0.1", fist_port + client->ID);
-				socket.bind(bindAddr);
-				socket.connect(messages[i].sender);
+				socket->bind(bindAddr);
+				socket->connect(messages[i].sender);
 
 				istream inStream;
 				inStream.push_var<uint>(client->ID);
+				inStream.push_var<uint>(fist_port + client->ID);
 
 				listen_socket.connect(messages[i].sender);
 				listen_socket.send(inStream.get_buffer(), inStream.size());
@@ -134,18 +150,18 @@ void efef::server::update()
 	}
 
 	for (uint i = 0u; i < clients.size(); ++i)
-		if (sockets[clients[i].ID].poll(RECEIVE))
-		{
-			clients[i].messages = sockets[clients[i].ID].receive();
+		if (clients[i].state == CONNECTED)
+			if (sockets[clients[i].ID]->poll(RECEIVE))
+			{
+				clients[i].messages = sockets[clients[i].ID]->receive();
 
-			for (uint j = 0u; j < clients[i].messages.size(); ++j)
-				if (clients[i].messages[j].type == DISCONNECT)
-				{
-					clients[i].state = DISCONNECTED;
+				for (uint j = 0u; j < clients[i].messages.size(); ++j)
+					if (clients[i].messages[j].type == DISCONNECT)
+					{
+						clients[i].state = DISCONNECTED;
 
-					byte sck[sizeof(fast_socket)];
-					memory_set(sck, 0u, sizeof(fast_socket));
-					sockets[clients[i].ID] = *reinterpret_cast<fast_socket*>(sck);
-				}
-		}
+						delete[] sockets[clients[i].ID];
+						sockets[clients[i].ID] = nullptr;
+					}
+			}
 }

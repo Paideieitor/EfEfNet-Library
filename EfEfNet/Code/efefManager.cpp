@@ -11,6 +11,8 @@ void efef::manager::update()
 {
     for (uint i = 0; i < sockets.size(); ++i)
         sockets[i]->update();
+    for (uint i = 0; i < servers.size(); ++i)
+        servers[i]->update();
 }
 
 efef::manager::manager()

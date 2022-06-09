@@ -19,6 +19,7 @@ efef::fast_socket::fast_socket(uint socket) : efef_socket(socket), nextID(ID_STA
     lastSentTime = GetTickCount();
     mAddress.fill(0u);
     mRemote.fill(0u);
+    toSend.size();
 
     efef::manager::instance()->sockets.add(this);
 }
@@ -29,6 +30,16 @@ efef::fast_socket::~fast_socket()
         delete[] messages[i].data;
     for (uint i = 0u; i < unaknowledged.size(); ++i)
         delete[] unaknowledged[i].data;
+    
+    efef::manager* const manager = efef::manager::instance();
+    uint index = 0u;
+    for (uint i = 0u; i < manager->sockets.size(); ++i)
+        if (manager->sockets[i] == this)
+        {
+            index = i;
+            break;
+        }
+    efef::manager::instance()->sockets.erase(index);
 }
 
 int efef::fast_socket::bind(socket_addr& addr)
@@ -55,6 +66,7 @@ int efef::fast_socket::bind(socket_addr&& addr)
 
 void efef::fast_socket::connect(const socket_addr& remoteAddress)
 {
+    clean_up();
     mRemote = remoteAddress;
 }
 
@@ -80,9 +92,9 @@ void efef::fast_socket::send(const byte* data, uint dataLength)
 {
     if (mRemote == false)
         return;
+    efef::DebugError("Sent Message");
 
-    if (toSend.size() == 0u)
-        toSend.push_var("\\");
+    toSend.push_var(dataLength);
 
     uint ID = nextID++;
     toSend.push_var(ID);
@@ -114,7 +126,7 @@ efef::set<efef::message> efef::fast_socket::receive()
 {
     efef::set<efef::message> output(messages.capacity());
     output.swap(messages);
-
+    output.dontDelete = true;
     return output;
 }
 
@@ -173,6 +185,7 @@ void efef::fast_socket::update()
         for (uint i = 0; i < unaknowledged.size(); ++i)
             if (currentTime - unaknowledged[i].time >= resend_wait_time)
             {
+                DebugError("Resent Message");
                 resend(unaknowledged[i]);
                 unaknowledged[i].time = GetTickCount();
             }
@@ -206,15 +219,13 @@ void efef::fast_socket::clean_up()
 
 void efef::fast_socket::send_ID(uint ID)
 {
-    if (toSend.size() == 0u)
-        toSend.push_var("\\");
+    toSend.push_var(0u);
     toSend.push_var(ID);
 }
 
 void efef::fast_socket::resend(efef::message& msg)
 {
-    if (toSend.size() == 0u)
-        toSend.push_var("\\");
+    toSend.push_var(msg.size);
 
     toSend.push_var(msg.ID);
     toSend.push_array(msg.data, msg.size);
@@ -245,6 +256,7 @@ void efef::fast_socket::receive_message()
         msg.sender = sender;
         messages.add(msg);
         efef::DebugError("Fast Socket Recieve Messages Error");
+        return;
     }
 
     bool access = true;
@@ -261,62 +273,65 @@ void efef::fast_socket::receive_message()
         efef::DebugError("Fast Socket Recieve Message Access Denied");
 
     uint head = 0;
-    for (uint i = 0u; i < (uint)bufferLength; ++i)
-        if (buffer[i] == '\\')
+    while (head < bytesRead)
+    {
+        uint size = *reinterpret_cast<uint*>(&buffer[head]);
+        head += sizeof(uint);
+
+        uint ID = *reinterpret_cast<uint*>(&buffer[head]);
+        head += sizeof(uint);
+
+        switch (ID)
         {
-            uint ID = *reinterpret_cast<uint*>(buffer[head]);
-            head += sizeof(uint);
-            
-            switch (ID)
+        case 0: // DISCONNECT
+            send_ID(1u);
+            force_send();
+            disconnect_socket(sender);
+            break;
+        case 1: // DISCONNECT AKNOWLEDGE
+            disconnect_socket(sender);
+            break;
+        default:
+            if (size > 0u) // NORMAL MESSAGE
             {
-            case 0: // DISCONNECT
-                send_ID(1u);
-                disconnect_socket(sender);
-                break;
-            case 1: // DISCONNECT AKNOWLEDGE
-                disconnect_socket(sender);
-                break;
-            default:
-                uint size = i - head;
-                if (size > 0u) // NORMAL MESSAGE
-                {
-                    for (uint j = 0u; j < recvIDs.size(); ++j)
-                        if (ID == recvIDs[j])
-                        {
-                            ID = 0u;
-                            break;
-                        }
-                    if (ID == 0u)
+                for (uint j = 0u; j < recvIDs.size(); ++j)
+                    if (ID == recvIDs[j])
+                    {
+                        ID = 0u;
                         break;
+                    }
+                if (ID == 0u)
+                    break;
 
-                    message msg;
-                    msg.ID = ID;
-                    msg.type = MESSAGE;
-                    msg.size = size;
-                    msg.data = new byte[msg.size];
-                    msg.sender = sender;
-                    memory_copy(buffer + head, msg.data, msg.size);
+                message msg;
+                msg.ID = ID;
+                msg.type = MESSAGE;
+                msg.size = size;
+                msg.data = new byte[msg.size];
+                msg.sender = sender;
+                memory_copy(buffer + head, msg.data, msg.size);
 
-                    if (recvIDs.size() > RECVID_SIZE)
-                        recvIDs.erase(0u);
-                    recvIDs.add(msg.ID);
+                if (recvIDs.size() > RECVID_SIZE)
+                    recvIDs.erase(0u);
+                recvIDs.add(msg.ID);
 
-                    messages.add(msg);
-                    send_ID(msg.ID);
-                }
-                else // AKNOWLEDGEMENT
-                    for (uint j = 0u; j < unaknowledged.size(); ++j)
-                        if (ID == unaknowledged[j].ID)
-                        {
-                            delete[] unaknowledged[j].data;
-                            unaknowledged.erase(j);
-                            break;
-                        }
-                break;
+                messages.add(msg);
+                send_ID(msg.ID);
+                DebugError("Sent Aknowledgement");
             }
-
-            head = i + 1;
+            else // AKNOWLEDGEMENT
+                for (uint j = 0u; j < unaknowledged.size(); ++j)
+                    if (ID == unaknowledged[j].ID)
+                    {
+                        DebugError("Received Aknowledgement");
+                        delete[] unaknowledged[j].data;
+                        unaknowledged.erase(j);
+                        break;
+                    }
+            break;
         }
+        head += size;
+    }
 
     delete[] buffer;
 }

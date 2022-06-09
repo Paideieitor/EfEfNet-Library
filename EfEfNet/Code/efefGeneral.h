@@ -18,6 +18,7 @@ namespace efef
 	udp_socket CreateUDPSocket(address_family family);
 	tcp_socket CreateTCPSocket(address_family family);
 	fast_socket CreateFastSocket(address_family family);
+	fast_socket* CreateDynmcFastSocket(address_family family);
 
 	int Poll(udp_socket* const socket, select_mode mode, long millisec = -1);
 	int Select(udp_set* const sockets, select_mode mode, long millisec = -1);

@@ -45,7 +45,7 @@ namespace efef
         void erase_list();
 
         access_state accessState = PUBLIC;
-        ulong send_rate_time = 10l;
+        ulong send_rate_time = 0l;
         ulong resend_wait_time = 200l;
 
         bool operator== (const bool& active) const;
@@ -79,6 +79,7 @@ namespace efef
         efef::set<socket_addr> recvList;
 
         friend fast_socket CreateFastSocket(address_family);
+        friend fast_socket* CreateDynmcFastSocket(address_family);
         friend class manager;
 	};
 }

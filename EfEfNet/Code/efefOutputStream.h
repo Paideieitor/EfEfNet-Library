@@ -52,6 +52,8 @@ namespace efef
 
 		bool dispose;
 
+		void Print();
+
 	private:
 
 		uint mCurrent;

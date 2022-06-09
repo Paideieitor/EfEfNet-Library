@@ -7,8 +7,8 @@ namespace efef
 	{
 	public:
 
-		set(uint capacity = 0u) : mSize(0u), mCapacity(capacity), mData(new T[mCapacity]) {}
-		~set() { delete mData; }
+		set(uint capacity = 2u) : mSize(0u), mCapacity(capacity), mData(new T[mCapacity]) {}
+		~set() { if (!dontDelete) delete mData; else dontDelete = false; }
 
 		void add(const T& t)
 		{
@@ -73,5 +73,9 @@ namespace efef
 		uint mSize;
 		uint mCapacity;
 		T* mData;
+
+	public:
+
+		bool dontDelete = false;
 	};
 }

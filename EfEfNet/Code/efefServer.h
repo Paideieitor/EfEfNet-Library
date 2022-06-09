@@ -9,7 +9,8 @@ namespace efef
 	class server
 	{
 	public:
-
+		
+		server();
 		~server();
 
 		enum client_state
@@ -19,10 +20,13 @@ namespace efef
 		};
 		struct client
 		{
+			~client()
+			{
+				messages.dontDelete = true;
+			}
+
 			char* name;
 			uint name_size;
-			char* password;
-			uint pw_size;
 
 			socket_addr address;
 			uint ID;
@@ -47,7 +51,7 @@ namespace efef
 		void update();
 
 		fast_socket listen_socket;
-		fast_socket sockets[SERVER_SIZE];
+		fast_socket* sockets[SERVER_SIZE];
 
 		set<client*> delete_messages;
 

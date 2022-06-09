@@ -100,6 +100,29 @@ efef::fast_socket efef::CreateFastSocket(address_family family)
     return fast_socket((uint)newSocket);
 }
 
+efef::fast_socket* efef::CreateDynmcFastSocket(address_family family)
+{
+    int af = 0;
+    switch (family)
+    {
+    case efef::IPv4:
+        af = AF_INET;
+        break;
+    case efef::IPv6:
+        af = AF_INET6;
+        break;
+    }
+
+    SOCKET newSocket = socket(af, SOCK_DGRAM, IPPROTO_UDP);
+    if (newSocket == INVALID_SOCKET)
+    {
+        efef::DebugError("Create Fast Socket Error");
+        return nullptr;
+    }
+
+    return new fast_socket((uint)newSocket);
+}
+
 int efef::Poll(udp_socket* const socket, select_mode mode, long millisec)
 {
     udp_set set;

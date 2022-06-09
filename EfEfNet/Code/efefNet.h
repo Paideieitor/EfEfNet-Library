@@ -7,3 +7,5 @@
 #include "efefSocketAddr.h"
 
 #include "efefGeneral.h"
+
+#include "efefManager.h"

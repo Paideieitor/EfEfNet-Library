@@ -35,3 +35,32 @@ void efef::istream::push(const byte& b)
 
 	mStream[mSize++] = b;
 }
+
+
+#ifdef EFEF_DEBUG
+
+#include <iostream>
+#include <string>
+void efef::istream::Print()
+{
+	char* toPrint = new char[mSize + 1u];
+	memory_copy(mStream, toPrint, mSize);
+
+	for (uint i = 0u; i < mSize; ++i)
+		if (toPrint[i] == '\0')
+			toPrint[i] = '0';
+		else if (toPrint[i] == '\n')
+			toPrint[i] = '1';
+
+	toPrint[mSize] = '\0';
+
+	std::string str(toPrint);
+	std::cout << str << '\n';
+	delete[] toPrint;
+}
+
+#else
+
+void efef::istream::Print() {}
+
+#endif // EFEF_DEBUG

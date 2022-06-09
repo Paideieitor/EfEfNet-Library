@@ -52,7 +52,11 @@ namespace efef
 			FD_ZERO(&set);
 			FD_SET(socket, &set);
 
-			timeval* waitPtr = nullptr;
+			timeval waitTime;
+			waitTime.tv_sec = 0l;
+			waitTime.tv_usec = 0l;
+			timeval* waitPtr = &waitTime;
+
 			return (bool)select(0, &set, nullptr, nullptr, waitPtr);
 		}
 

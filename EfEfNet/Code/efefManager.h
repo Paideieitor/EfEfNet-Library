@@ -1,6 +1,7 @@
 #pragma once
 
 #include "efefGeneral.h"
+#include "efefServer.h"
 
 namespace efef
 {
@@ -13,6 +14,7 @@ namespace efef
 		void update();
 
 		fast_set sockets;
+		efef::set<server*> servers;
 
 	private:
 
