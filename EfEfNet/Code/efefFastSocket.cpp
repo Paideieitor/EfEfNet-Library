@@ -47,7 +47,7 @@ int efef::fast_socket::bind(socket_addr& addr)
     int error = ws2bind((SOCKET)mSocket, efef::GetAddress(addr.mAddress), ADDR_SIZE);
 
     if (error < 0)
-        return efef::DebugError("Fast Socket Bind Error");
+        return efef::DebugError(L"Fast Socket Bind Error");
 
     mAddress = addr;
     return EFEF_NO_ERROR;
@@ -58,7 +58,7 @@ int efef::fast_socket::bind(socket_addr&& addr)
     int error = ws2bind((SOCKET)mSocket, efef::GetAddress(addr.mAddress), ADDR_SIZE);
 
     if (error < 0)
-        return efef::DebugError("Fast Socket Bind Error");
+        return efef::DebugError(L"Fast Socket Bind Error");
 
     mAddress = addr;
     return EFEF_NO_ERROR;
@@ -92,7 +92,7 @@ void efef::fast_socket::send(const byte* data, uint dataLength)
 {
     if (mRemote == false)
         return;
-    efef::DebugError("Sent Message");
+    efef::DebugError(L"Sent Message");
 
     toSend.push_var(dataLength);
 
@@ -185,7 +185,7 @@ void efef::fast_socket::update()
         for (uint i = 0; i < unaknowledged.size(); ++i)
             if (currentTime - unaknowledged[i].time >= resend_wait_time)
             {
-                DebugError("Resent Message");
+                DebugError(L"Resent Message");
                 resend(unaknowledged[i]);
                 unaknowledged[i].time = GetTickCount();
             }
@@ -236,7 +236,7 @@ void efef::fast_socket::send_message()
     int bytesSent = sendto(mSocket, (const char*)toSend.get_buffer(), toSend.size(), 0, efef::GetAddress(mRemote.mAddress), ADDR_SIZE);
 
     if (bytesSent < (int)toSend.size())
-        efef::DebugError("Fast Socket Send Message To Error");
+        efef::DebugError(L"Fast Socket Send Message To Error");
 
     toSend.clear();
 }
@@ -255,7 +255,7 @@ void efef::fast_socket::receive_message()
         msg.type = FAIL;
         msg.sender = sender;
         messages.add(msg);
-        efef::DebugError("Fast Socket Recieve Messages Error");
+        efef::DebugError(L"Fast Socket Recieve Messages Error");
         return;
     }
 
@@ -270,10 +270,10 @@ void efef::fast_socket::receive_message()
             access = !access;
     }
     if (!access)
-        efef::DebugError("Fast Socket Recieve Message Access Denied");
+        efef::DebugError(L"Fast Socket Recieve Message Access Denied");
 
-    uint head = 0;
-    while (head < bytesRead)
+    uint head = 0u;
+    while ((int)head < bytesRead)
     {
         uint size = *reinterpret_cast<uint*>(&buffer[head]);
         head += sizeof(uint);
@@ -317,13 +317,13 @@ void efef::fast_socket::receive_message()
 
                 messages.add(msg);
                 send_ID(msg.ID);
-                DebugError("Sent Aknowledgement");
+                DebugError(L"Sent Aknowledgement");
             }
             else // AKNOWLEDGEMENT
                 for (uint j = 0u; j < unaknowledged.size(); ++j)
                     if (ID == unaknowledged[j].ID)
                     {
-                        DebugError("Received Aknowledgement");
+                        DebugError(L"Received Aknowledgement");
                         delete[] unaknowledged[j].data;
                         unaknowledged.erase(j);
                         break;

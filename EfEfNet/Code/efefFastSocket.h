@@ -50,7 +50,7 @@ namespace efef
 
         bool operator== (const bool& active) const;
 
-    private:
+    //private: // TODO
 
         fast_socket(uint socket);
 

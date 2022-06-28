@@ -9,13 +9,13 @@ int efef::Init()
     WSADATA data;
 
     if (WSAStartup(version, &data) == SOCKET_ERROR)
-        return efef::DebugError("Start Up Error");
+        return efef::DebugError(L"Start Up Error");
 
     if (data.wVersion != version)
     {
         if (WSACleanup() == SOCKET_ERROR)
-            return efef::DebugError("Version Clean Up Error");
-        return efef::DebugError("Version Error");
+            return efef::DebugError(L"Version Clean Up Error");
+        return efef::DebugError(L"Version Error");
     }
 
     if (efef::manager::inst == nullptr)
@@ -27,7 +27,7 @@ int efef::Init()
 int efef::CleanUp()
 {
     if (WSACleanup() == SOCKET_ERROR)
-        return efef::DebugError("Clean Up Error");
+        return efef::DebugError(L"Clean Up Error");
 
     delete efef::manager::inst;
     efef::manager::inst = nullptr;
@@ -55,7 +55,7 @@ efef::udp_socket efef::CreateUDPSocket(address_family family)
 
     SOCKET newSocket = socket(af, SOCK_DGRAM, IPPROTO_UDP);
     if (newSocket == INVALID_SOCKET)
-        return efef::DebugError("Create UDP Socket Error");
+        return efef::DebugError(L"Create UDP Socket Error");
 
     return udp_socket((uint)newSocket);
 }
@@ -75,7 +75,7 @@ efef::tcp_socket efef::CreateTCPSocket(address_family family)
 
     SOCKET newSocket = socket(af, SOCK_STREAM, IPPROTO_TCP);
     if (newSocket == INVALID_SOCKET)
-        return efef::DebugError("Create TCP Socket Error");
+        return efef::DebugError(L"Create TCP Socket Error");
 
     return tcp_socket((uint)newSocket);
 }
@@ -95,7 +95,7 @@ efef::fast_socket efef::CreateFastSocket(address_family family)
 
     SOCKET newSocket = socket(af, SOCK_DGRAM, IPPROTO_UDP);
     if (newSocket == INVALID_SOCKET)
-        return efef::DebugError("Create Fast Socket Error");
+        return efef::DebugError(L"Create Fast Socket Error");
 
     return fast_socket((uint)newSocket);
 }
@@ -116,7 +116,7 @@ efef::fast_socket* efef::CreateDynmcFastSocket(address_family family)
     SOCKET newSocket = socket(af, SOCK_DGRAM, IPPROTO_UDP);
     if (newSocket == INVALID_SOCKET)
     {
-        efef::DebugError("Create Fast Socket Error");
+        efef::DebugError(L"Create Fast Socket Error");
         return nullptr;
     }
 

@@ -42,14 +42,14 @@ void efef::server::bind(socket_addr&& address)
 	listen_socket.bind(address);
 }
 
-int efef::server::send_to(uint ID, byte* data, uint dataLength)
+int efef::server::send_to(uint ID, const byte* data, uint dataLength)
 {
 	sockets[ID]->send(data, dataLength);
 
 	return EFEF_NO_ERROR;
 }
 
-int efef::server::send_to(const client* const client, byte* data, uint dataLength)
+int efef::server::send_to(const client* const client, const byte* data, uint dataLength)
 {
 	sockets[client->ID]->send(data, dataLength);
 
@@ -110,7 +110,7 @@ void efef::server::update()
 
 				if (error)
 				{
-					efef::DebugError("Server Acces Denied: client already logged in");
+					efef::DebugError(L"Server Acces Denied: client already logged in");
 					continue;
 				}
 				if (!client)

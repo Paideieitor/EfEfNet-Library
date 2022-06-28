@@ -59,10 +59,10 @@ void efef::socket_addr::fill(wstr presentation, const ushort port)
     switch (InetPton(AF_INET, presentation, &inAddress->sin_addr))
     {
     case 0:
-        efef::DebugError("Socket Address Constructor PtoN Error: Malformed string");
+        efef::DebugError(L"Socket Address Constructor PtoN Error: Malformed string");
         break;
     case SOCKET_ERROR:
-        efef::DebugError("Socket Address Constructor PtoN Error");
+        efef::DebugError(L"Socket Address Constructor PtoN Error");
         break;
     }
 }

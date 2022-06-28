@@ -154,6 +154,7 @@
     <ClCompile Include="efefTCPSocket.cpp" />
     <ClCompile Include="efefUDPSocket.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Render.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="efefClient.h" />
@@ -174,6 +175,8 @@
     <ClInclude Include="efefTCPSocket.h" />
     <ClInclude Include="efefGlobals.h" />
     <ClInclude Include="efefUDPSocket.h" />
+    <ClInclude Include="Point.h" />
+    <ClInclude Include="Render.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

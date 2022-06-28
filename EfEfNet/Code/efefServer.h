@@ -38,8 +38,8 @@ namespace efef
 		void bind(socket_addr& address);
 		void bind(socket_addr&& address);
 
-		int send_to(uint ID, byte* data, uint dataLength);
-		int send_to(const client* client, byte* data, uint dataLength);
+		int send_to(uint ID, const byte* data, uint dataLength);
+		int send_to(const client* client, const byte* data, uint dataLength);
 
 		set<const client*> pendant_clients();
 

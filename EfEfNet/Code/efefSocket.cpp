@@ -16,7 +16,7 @@ int efef::efef_socket::bind(socket_addr& addr)
     int error = ws2bind((SOCKET)mSocket, efef::GetAddress(addr.mAddress), ADDR_SIZE);
 
     if (error < 0)
-        return efef::DebugError("Socket Bind Error");
+        return efef::DebugError(L"Socket Bind Error");
 
     return EFEF_NO_ERROR;
 }
@@ -26,7 +26,7 @@ int efef::efef_socket::bind(socket_addr&& addr)
     int error = ws2bind((SOCKET)mSocket, efef::GetAddress(addr.mAddress), ADDR_SIZE);
 
     if (error < 0)
-        return efef::DebugError("Socket Bind Error");
+        return efef::DebugError(L"Socket Bind Error");
 
     return EFEF_NO_ERROR;
 }
@@ -42,7 +42,7 @@ int efef::efef_socket::set_blocking(bool enable)
 
     int error = ioctlsocket((SOCKET)mSocket, FIONBIO, &arg);
     if (error < 0)
-        return efef::DebugError("Socket SetBlocking Error");
+        return efef::DebugError(L"Socket SetBlocking Error");
 
     mBlocking = enable;
     return EFEF_NO_ERROR;

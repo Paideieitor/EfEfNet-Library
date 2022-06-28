@@ -2,15 +2,14 @@
 
 #include "efefPrivateGlobals.h"
 
-#ifdef EFEF_DEBUG
-    #include <iostream>
-#endif
-
-int efef::DebugError(str str)
+int efef::DebugError(wstr str)
 {
 #ifdef EFEF_DEBUG
     int error = WSAGetLastError();
-    std::cout << str << " -> " << error << '\n';
+    render->Log(str);
+    wchar_t s[16];
+    _itow_s(error, s, 16, 10);
+    render->Log(s);
 #endif
     return EFEF_ERROR;
 }
