@@ -74,6 +74,10 @@ void Render::Log(std::wstring text)
 {
     DWORD bytesWritten = 0;
 
+    wchar_t nothing[64] = L"                                                               ";
+    WriteConsoleOutputCharacter(console, nothing, 64, { (SHORT)(0), (SHORT)(RESY + line) }, &bytesWritten);
+
+    bytesWritten = 0;
     WriteConsoleOutputCharacter(console, text.c_str(), text.size(), { (SHORT)(0), (SHORT)(RESY + line) }, &bytesWritten);
     ++line;
     if (line >= 30)

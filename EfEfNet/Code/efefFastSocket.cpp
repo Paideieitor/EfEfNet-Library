@@ -92,7 +92,7 @@ void efef::fast_socket::send(const byte* data, uint dataLength)
 {
     if (mRemote == false)
         return;
-    efef::DebugError(L"Sent Message");
+    //efef::DebugError(L"Sent Message");
 
     toSend.push_var(dataLength);
 
@@ -122,7 +122,7 @@ void efef::fast_socket::force_send()
     lastSentTime = GetTickCount();
 }
 
-efef::set<efef::message> efef::fast_socket::receive()
+efef::set<efef::message>& efef::fast_socket::receive()
 {
     efef::set<efef::message> output(messages.capacity());
     output.swap(messages);
@@ -133,6 +133,12 @@ efef::set<efef::message> efef::fast_socket::receive()
 void efef::fast_socket::disconnect()
 {
     send_ID(0u);
+}
+
+void efef::fast_socket::unilateral_disconnect()
+{
+    mRemote.fill(0u);
+    clean_up();
 }
 
 void efef::fast_socket::add_to_list(const socket_addr& address)
@@ -185,7 +191,7 @@ void efef::fast_socket::update()
         for (uint i = 0; i < unaknowledged.size(); ++i)
             if (currentTime - unaknowledged[i].time >= resend_wait_time)
             {
-                DebugError(L"Resent Message");
+                //DebugError(L"Resent Message");
                 resend(unaknowledged[i]);
                 unaknowledged[i].time = GetTickCount();
             }
@@ -256,6 +262,8 @@ void efef::fast_socket::receive_message()
         msg.sender = sender;
         messages.add(msg);
         efef::DebugError(L"Fast Socket Recieve Messages Error");
+
+        delete[] buffer;
         return;
     }
 
@@ -265,7 +273,7 @@ void efef::fast_socket::receive_message()
         access = false;
         for (uint i = 0; i < recvList.size(); ++i)
             if (recvList[i] == sender)
-                true;
+                access = true;
         if (accessState == BAN_LIST)
             access = !access;
     }
@@ -317,13 +325,13 @@ void efef::fast_socket::receive_message()
 
                 messages.add(msg);
                 send_ID(msg.ID);
-                DebugError(L"Sent Aknowledgement");
+                //DebugError(L"Sent Aknowledgement");
             }
             else // AKNOWLEDGEMENT
                 for (uint j = 0u; j < unaknowledged.size(); ++j)
                     if (ID == unaknowledged[j].ID)
                     {
-                        DebugError(L"Received Aknowledgement");
+                        //DebugError(L"Received Aknowledgement");
                         delete[] unaknowledged[j].data;
                         unaknowledged.erase(j);
                         break;

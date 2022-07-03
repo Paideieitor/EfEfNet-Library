@@ -34,9 +34,10 @@ namespace efef
         void send(const byte* data, uint dataLength);
         void force_send();
         // WARNING: messages on the set must be destroyed to free their memory, use the destroy() member fuction 
-        efef::set<message> receive();
+        efef::set<message>& receive();
 
         void disconnect();
+        void unilateral_disconnect();
 
         void add_to_list(const socket_addr& fromAddress);
         void erase_from_list(const socket_addr& fromAddress);

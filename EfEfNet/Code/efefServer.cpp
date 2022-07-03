@@ -56,7 +56,7 @@ int efef::server::send_to(const client* const client, const byte* data, uint dat
 	return EFEF_NO_ERROR;
 }
 
-efef::set<const efef::server::client*> efef::server::pendant_clients()
+efef::set<const efef::server::client*>& efef::server::pendant_clients()
 {
 	set<const client*> output;
 	output.dontDelete = true;
@@ -143,6 +143,7 @@ void efef::server::update()
 				listen_socket.connect(messages[i].sender);
 				listen_socket.send(inStream.get_buffer(), inStream.size());
 				listen_socket.force_send();
+				listen_socket.unilateral_disconnect();
 			}
 
 			messages[i].destroy();
@@ -153,12 +154,14 @@ void efef::server::update()
 		if (clients[i].state == CONNECTED)
 			if (sockets[clients[i].ID]->poll(RECEIVE))
 			{
-				clients[i].messages = sockets[clients[i].ID]->receive();
+				set<message> messages = sockets[clients[i].ID]->receive();
+				clients[i].messages.swap(messages);
 
 				for (uint j = 0u; j < clients[i].messages.size(); ++j)
 					if (clients[i].messages[j].type == DISCONNECT)
 					{
 						clients[i].state = DISCONNECTED;
+						clients[i].address.fill(0u);
 
 						delete[] sockets[clients[i].ID];
 						sockets[clients[i].ID] = nullptr;

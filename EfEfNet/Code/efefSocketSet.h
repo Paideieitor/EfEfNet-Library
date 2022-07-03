@@ -8,7 +8,13 @@ namespace efef
 	public:
 
 		set(uint capacity = 2u) : mSize(0u), mCapacity(capacity), mData(new T[mCapacity]) {}
-		~set() { if (!dontDelete) delete mData; else dontDelete = false; }
+		~set() 
+		{ 
+			if (!dontDelete)
+				delete mData;
+			else 
+				dontDelete = false; 
+		}
 
 		void add(const T& t)
 		{
@@ -67,6 +73,29 @@ namespace efef
 		uint capacity() const { return mCapacity; }
 
 		T& operator[](uint index) const { return index < mSize ? mData[index] : mData[-1]; }
+
+		//void operator=(set&& s)
+		//{
+		//	mSize = s->mSize;
+		//	mCapacity = s->mCapacity;
+		//	mData = s->mData;
+		//	dontDelete = s->dontDelete;
+		//
+		//	s->dontDelete = true;
+		//}
+		//
+		//void operator=(set& s)
+		//{
+		//	delete[] mData;
+		//
+		//	mSize = s->mSize;
+		//	mCapacity = s->mCapacity;
+		//
+		//	mData = new T[mCapacity];
+		//	memory_copy(s->mData, mData, mSize);
+		//
+		//	dontDelete = s->dontDelete;
+		//}
 
 	private:
 

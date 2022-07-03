@@ -41,7 +41,7 @@ namespace efef
 		int send_to(uint ID, const byte* data, uint dataLength);
 		int send_to(const client* client, const byte* data, uint dataLength);
 
-		set<const client*> pendant_clients();
+		set<const client*>& pendant_clients();
 
 		uint fist_port = 6000u;
 		set<client> clients;
