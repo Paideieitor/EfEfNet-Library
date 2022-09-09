@@ -75,7 +75,7 @@ void efef::server::update()
 	for (uint i = 0u; i < delete_messages.size(); ++i)
 	{
 		for (uint j = 0u; j < delete_messages[i]->messages.size(); ++j)
-			delete[] delete_messages[i]->messages[i].data;
+			delete_messages[i]->messages[i].destroy();
 
 		delete_messages[i]->messages.clear();
 	}

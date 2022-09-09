@@ -1,4 +1,4 @@
-#include <Windows.h>
+/*#include <Windows.h>
 #include <WinUser.h>
 
 #include "efefNet.h"
@@ -159,103 +159,76 @@ int main()
 
 		efef::socket_addr address1(L"127.0.0.1", 6001u);
 		efef::fast_socket socket1 = efef::CreateFastSocket(efef::address_family::IPv4);
+		uint socket1ID = 0u;
 		socket1.bind(address1);
 		socket1.connect(serveraddress);
 
 		efef::istream input1;
 		input1.push_var(9u);
-		input1.push_array("Socket 1", 9u);
+		input1.push_array(L"Socket 1", 9u);
 		socket1.send(input1.get_buffer(), input1.size());
 
+		bool exit = false;
 		while (true)
 		{
+			if (exit)
+			{
+				exit = false;
+				break;
+			}
+
 			if (socket1.poll(efef::select_mode::RECEIVE))
 			{
-				efef::set<efef::message> messages = socket1.receive();
-				for (uint i = 0u; i < messages.size(); ++i)
+				efef::set<efef::message> msgs = socket1.receive();
+				for (uint i = 0u; i < msgs.size(); ++i)
 				{
-					switch (messages[i].type)
+					if (msgs[i].type == efef::message_type::MESSAGE)
 					{
-					case efef::message_type::MESSAGE:
-					{
-						switch (state)
-						{
-						case cstate::DISC:
-						{
-							efef::ostream output(messages[i].data, messages[i].size);
+						efef::ostream out(msgs[i].data, msgs[i].size);
 
-							uint ID = output.get_var<uint>();
-							uint port = output.get_var<uint>();
+						socket1ID = out.get_var<uint>();
+						uint port = out.get_var<uint>();
 
-							efef::socket_addr newserveraddress(L"127.0.0.1", port);
-							socket1.connect(newserveraddress);
+						efef::socket_addr newAddress(L"127.0.0.1", port);
 
-							efef::istream input;
-							input.push_var(124u);
-							socket1.send(input.get_buffer(), input.size());
+						socket1.unilateral_disconnect();
+						socket1.connect(newAddress);
 
-							state = cstate::CON;
-						}
-						break;
-						case cstate::CON:
-						{
-							efef::ostream output(messages[i].data, messages[i].size);
-							uint n = output.get_var<uint>();
-
-							wchar_t mesg[64];
-							swprintf_s(mesg, L"Client Received: %u", n);
-							render->Log(mesg);
-
-							efef::istream input;
-							input.push_var(124u);
-							socket1.send(input.get_buffer(), input.size());
-
-							if (GetKey(VK_SPACE))
-							{
-								socket1.disconnect();
-								state = cstate::DISC;
-							}
-						}
-						break;
-						}
-						messages[i].destroy();
-					}
-					break;
-					case efef::message_type::DISCONNECT:
-						break;
-					case efef::message_type::FAIL:
-						break;
+						exit = true;
 					}
 				}
 			}
 
+			manager->update();
+		}
+
+		socket1.send(input1.get_buffer(), input1.size());
+
+		while (true)
+		{
 			efef::set<const efef::server::client*> clients = server.pendant_clients();
-			for (uint c = 0u; c < clients.size(); ++c)
+			for (uint i = 0u; i < clients.size(); ++i)
 			{
-				for (uint i = 0u; i < clients[c]->messages.size(); ++i)
+				for (uint n = 0u; n < clients[i]->messages.size(); ++n)
 				{
-					switch (clients[c]->messages[i].type)
+					efef::message& msg = clients[i]->messages[n];
+					if (msg.type == efef::message_type::MESSAGE)
 					{
-					case efef::MESSAGE:
-					{
-						efef::ostream output(clients[c]->messages[i].data, clients[c]->messages[i].size);
-						uint n = output.get_var<uint>();
-
-						wchar_t mesg[64];
-						swprintf_s(mesg, L"Server Received: %u", n);
-						render->Log(mesg);
-
-						efef::istream input;
-						input.push_var(7707u);
-						server.send_to(clients[c], input.get_buffer(), input.size());
+						const wchar_t* w = (const wchar_t*)(msg.data + sizeof(uint));
+						render->Log(w);
+						
+						server.send_to(clients[i], (const byte*)L"YOOO\0", 10u);
 					}
-					break;
-					case efef::DISCONNECT:
-						render->Log(L"HE DISCONNECTED!");
-						break;
-					case efef::FAIL:
-						break;
-					}
+				}
+			}
+
+			if (socket1.poll(efef::select_mode::RECEIVE))
+			{
+				efef::set<efef::message> msgs = socket1.receive();
+				for (uint i = 0u; i < msgs.size(); ++i)
+				{
+					render->Log((const wchar_t*)msgs[i].data);
+					msgs[i].destroy();
 				}
 			}
 
