@@ -71,6 +71,6 @@ private:
     std::vector<RenderRequest> renderQueue;
 };
 
-//extern Render* render;
+extern Render* render;
 
 #endif //_RENDER_

@@ -1,382 +1,364 @@
-/*#include <Windows.h>
+#include <Windows.h>
 #include <WinUser.h>
 
 #include "efefNet.h"
 #include "efefStreams.h"
 
 #include "Render.h"
-Render* render = nullptr;
 
 #include <iostream>
 #include <string>
 
+char alphabet[26] = { 'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
+
+HWND winHandle = GetForegroundWindow();
+Render* render = nullptr;
+efef::manager* manager = nullptr;
+bool first = false;
+
 bool GetKey(int VKey)
 {
-	int pressed = GetKeyState(VKey);
-	if (pressed != 0 && pressed != 1)
-		return true;
+	if (winHandle == GetForegroundWindow())
+	{
+		int pressed = GetKeyState(VKey);
+		if (pressed != 0 && pressed != 1)
+			return true;
+	}
 	return false;
 }
 
-void FastSocketTest()
+void Start()
 {
-	efef::socket_addr address1(L"127.0.0.1", 6000u);
-	efef::socket_addr address2(L"127.0.0.1", 6001u);
+	if (efef::Init() == EFEF_ERROR)
+		return;
 
-	efef::fast_socket socket1 = efef::CreateFastSocket(efef::address_family::IPv4);
-	efef::fast_socket socket2 = efef::CreateFastSocket(efef::address_family::IPv4);
+	render->Start();
 
-	socket1.bind(address1);
-	socket2.bind(address2);
+	manager = efef::manager::instance();
+}
 
-	socket1.connect(address2);
-	socket2.connect(address1);
+uint currentChat = 0u;
+uint chatSize = 0u;
+#define MAX_CHAT 10u
+std::wstring chat[MAX_CHAT];
 
-	efef::istream input1;
-	input1.push_array("Socket 1", 9u);
+std::wstring chatMessage;
 
-	efef::istream input2;
-	input2.push_array("Socket 2", 9u);
+void InsertChatMessage(const std::wstring& msg)
+{
+	chat[currentChat++] = msg;
 
-	socket1.send(input1.get_buffer(), input1.size());
+	if (currentChat >= MAX_CHAT)
+		currentChat = 0u;
 
-	while (true)
+	if (chatSize < MAX_CHAT)
+		++chatSize;
+}
+
+int lastInput = 0;
+void TextInput(efef::fast_socket& socket)
+{
+	for (uint i = 0u; i < 26u; ++i)
 	{
-		if (GetKey(VK_LCONTROL))
-			socket1.disconnect();
-		if (GetKey(VK_RCONTROL))
-		{
-			socket1.connect(address2);
-			socket2.connect(address1);
-
-			socket1.send(input1.get_buffer(), input1.size());
-		}
-
-		if (!GetKey(VK_SPACE))
-			if (socket1.poll(efef::select_mode::RECEIVE))
+		if (GetKey(alphabet[i]))
+			if (alphabet[i] != lastInput)
 			{
-				efef::set<efef::message> messages = socket1.receive();
-				for (uint i = 0u; i < messages.size(); ++i)
-				{
-					switch (messages[i].type)
-					{
-					case efef::message_type::MESSAGE:
-					{
-						efef::ostream output(messages[i].data, messages[i].size);
-						wchar_t words[64];
-						render->Log(output.get_array(words, 64));
-
-						messages[i].destroy();
-
-						socket1.send(input1.get_buffer(), input1.size());
-					}
-					break;
-					case efef::message_type::DISCONNECT:
-						render->Log(L"Socket 1 Disconnected");
-						break;
-					case efef::message_type::FAIL:
-						break;
-					}
-				}
-			}
-
-		if (socket2.poll(efef::select_mode::RECEIVE))
-		{
-			efef::set<efef::message> messages = socket2.receive();
-			for (uint i = 0u; i < messages.size(); ++i)
-			{
-				switch (messages[i].type)
-				{
-				case efef::message_type::MESSAGE:
-				{
-					efef::ostream output(messages[i].data, messages[i].size);
-					wchar_t words[64];
-					render->Log(output.get_array(words, 64));
-
-					messages[i].destroy();
-
-					socket2.send(input2.get_buffer(), input2.size());
-				}
+				lastInput = alphabet[i];
+				chatMessage += lastInput;
 				break;
-				case efef::message_type::DISCONNECT:
-					render->Log(L"Socket 2 Disconnected");
-					break;
-				case efef::message_type::FAIL:
-					break;
-				}
 			}
-		}
 	}
-}
 
-void PrintClientList(const efef::server& server)
-{
-	std::cout << "Client List\n";
-	for (uint i = 0u; i < server.clients.size(); ++i)
+	if (GetKey(VK_SPACE) && VK_SPACE != lastInput)
 	{
-		efef::server::client& client = server.clients[i];
-
-		std::string state = " ";
-		switch (client.state)
-		{
-		case efef::server::client_state::CONNECTED:
-			state = "CONNECTED";
-			break;
-		case efef::server::client_state::DISCONNECTED:
-			state = "DISCONNECTED";
-			break;
-		}
-		std::cout << "[ " << client.name << ", " << client.ID << ", " << state << " ]\n";
+		lastInput = VK_SPACE;
+		chatMessage += L' ';
 	}
-	std::cout << '\n';
+
+	if (!chatMessage.empty() && GetKey(VK_BACK) && VK_BACK != lastInput)
+	{
+		lastInput = VK_BACK;
+		chatMessage.erase(chatMessage.end());
+	}
+
+	if (GetKey(VK_RETURN) && !chatMessage.empty())
+	{
+		InsertChatMessage(std::wstring(L"You: ") + chatMessage);
+		chatMessage += L'\0';
+		efef::istream istr;
+		istr.push_var<uint>(1u);
+		istr.push_var<uint>(chatMessage.size());
+		istr.push_array<wchar>(const_cast<wchar*>(chatMessage.c_str()), chatMessage.size());
+		socket.send(istr.get_buffer(), istr.size());
+		chatMessage.clear();
+	}
 }
 
-enum class cstate
+enum State
 {
-	DISC,
-	CON
+	CHOOSE,
+	WAIT,
+	DISCONNECTED
 };
+State state = CHOOSE;
+
+iPoint score = { 0,0 };
+std::wstring action; 
+std::wstring oppAction;
+std::wstring result;
+
+byte you = '0';
+byte opp = '0';
+
+void Play()
+{
+	switch (opp)
+	{
+	case '1':
+		oppAction = L"Your opponent played Rock!";
+		break;
+	case '2':
+		oppAction = L"Your opponent played Paper!";
+		break;
+	case '3':
+		oppAction = L"Your opponent played Scissors!";
+		break;
+	}
+
+	int match = (int)you - (int)opp;
+
+	switch (match)
+	{
+	case 0:
+		result = L"It's a DRAW";
+		break;
+	case 1:
+		result = L"You WIN :D";
+		++score.x;
+		break;
+	case -1:
+		result = L"You LOST :(";
+		++score.y;
+		break;
+	case 2:
+		result = L"You LOST :(";
+		++score.y;
+		break;
+	case -2:
+		result = L"You WIN :D";
+		++score.x;
+		break;
+	}
+
+	you = '0';
+	opp = '0';
+	state = CHOOSE;
+
+	Sleep(500);
+}
+
+void Chat(efef::ostream& ostr)
+{
+	uint size = ostr.get_var<uint>();
+	wchar* cMsg = ostr.dynm_get_array<wchar>(size);
+	std::wstring str = std::wstring(L"Opp: ") + cMsg;
+	InsertChatMessage(str);
+
+	delete[] cMsg;
+}
+
+bool Update(efef::fast_socket& socket)
+{
+	if (GetKey('Z'))
+	{
+		efef::istream istr;
+		istr.push_var<uint>(2u);
+		socket.send(istr.get_buffer(), istr.size());
+		socket.force_send();
+
+		return false;
+	}
+
+	render->RenderText(1, L"Rock: 1 - Paper: 2 - Scissors: 3", { 0.0f, 0.0f });
+
+	if (socket.poll(efef::select_mode::RECEIVE))
+	{
+		efef::set<efef::message> messages = socket.receive();
+		for (uint i = 0u; i < messages.size(); ++i)
+		{
+			efef::message& msg = messages[i];
+			if (msg.type != efef::message_type::MESSAGE)
+				continue;
+
+			efef::ostream ostr(msg.data, msg.size);
+			switch (ostr.get_var<uint>())
+			{
+			case 0u:
+				opp = ostr.get_var<byte>();
+				break;
+			case 1u:
+				Chat(ostr);
+				break;
+			case 2u:
+				state = DISCONNECTED;
+				break;
+			}
+			
+			msg.destroy();
+		}
+	}
+
+	switch (state)
+	{
+	case CHOOSE:
+		render->RenderText(1, L"Choose an action...", { 0.0f, 2.0f });
+
+		if (GetKey('1'))
+			you = '1';
+		else if (GetKey('2'))
+			you = '2';
+		else if (GetKey('3'))
+			you = '3';
+
+		if (you != '0')
+		{
+			efef::istream istr;
+			istr.push_var<uint>(0u);
+			istr.push_var<byte>(you);
+			socket.send(istr.get_buffer(), istr.size());
+
+			switch (you)
+			{
+			case '1':
+				action = L"You played Rock!";
+				break;
+			case '2':
+				action = L"You played Paper!";
+				break;
+			case '3':
+				action = L"You played Scissors!";
+				break;
+			}
+			oppAction = L"";
+			state = WAIT;
+		}
+		break;
+	case WAIT:
+		render->RenderText(1, L"Waiting for the opponent...", { 0.0f, 2.0f });
+		if (opp != '0')
+			Play();
+		break;
+	case DISCONNECTED:
+		action = L"Opponent disconected";
+		oppAction = L" ";
+		result = L" ";
+		for (uint i = 0u; i < chatSize; ++i)
+			chat[i] = L" ";
+		break;
+	}
+
+	wchar_t scoreDisplay[64];
+	wsprintf(scoreDisplay, L"You -> %d - %d <- Opp", score.x, score.y);
+	render->RenderText(1, scoreDisplay, { 0.0f, 3.0f });
+
+	render->RenderText(1, action, {0.0f, 5.0f});
+	render->RenderText(1, oppAction, { 0.0f, 6.0f });
+	render->RenderText(1, result, { 0.0f, 8.0f });
+
+	float firstY = 10.0f;
+	for (uint i = 0u; i < chatSize; ++i)
+	{
+		render->RenderText(1, chat[i], {0.0f, firstY + (float)i});
+	}
+
+	if (GetKey(VK_ESCAPE))
+		return false;
+
+	return true;
+}
+
+void CleanUp()
+{
+	if (efef::CleanUp() == EFEF_ERROR)
+		return;
+
+	render->CleanUp();
+}
 
 int main()
 {
 	render = new Render(true);
 
-	if (efef::Init() == EFEF_ERROR)
-	{
-		return 0;
-	}
-	render->Start();
-	
-	efef::manager* const manager = efef::manager::instance();
+	Start();
 
 	{
-		efef::socket_addr serveraddress(L"127.0.0.1", 6000u);
-		efef::server server;
-		server.fist_port = 6005u;
-		server.bind(serveraddress);
+		uint thisPort = 6000u;
+		uint remotePort = 6001u;
 
-		cstate state = cstate::DISC;
-
-		efef::socket_addr address1(L"127.0.0.1", 6001u);
-		efef::fast_socket socket1 = efef::CreateFastSocket(efef::address_family::IPv4);
-		uint socket1ID = 0u;
-		socket1.bind(address1);
-		socket1.connect(serveraddress);
-
-		efef::istream input1;
-		input1.push_var(9u);
-		input1.push_array(L"Socket 1", 9u);
-		socket1.send(input1.get_buffer(), input1.size());
-
-		bool exit = false;
 		while (true)
 		{
-			if (exit)
+			if (GetKey(VK_SPACE))
 			{
-				exit = false;
 				break;
 			}
-
-			if (socket1.poll(efef::select_mode::RECEIVE))
+			else if (GetKey(VK_CONTROL))
 			{
-				efef::set<efef::message> msgs = socket1.receive();
-				for (uint i = 0u; i < msgs.size(); ++i)
+				thisPort = 6001u;
+				remotePort = 6000u;
+				break;
+			}
+		}
+		
+		Sleep(1000);
+
+		efef::socket_addr thisAddress(L"127.0.0.1", thisPort);
+		efef::socket_addr remoteAddress(L"127.0.0.1", remotePort);
+		efef::fast_socket socket = efef::CreateFastSocket(efef::address_family::IPv4);
+
+		socket.bind(thisAddress);
+		socket.connect(remoteAddress);
+
+		render->RenderText(1, L"Looking for a match...", { 0.0f, 3.0f });
+		render->Update(0.0f);
+		{
+			byte confirmation = 'A';
+			while (confirmation == 'A')
+			{
+				if (GetKey(VK_CONTROL))
 				{
-					if (msgs[i].type == efef::message_type::MESSAGE)
+					socket.send(&confirmation, 1u);
+					break;
+				}
+
+				manager->update();
+
+				if (socket.poll(efef::select_mode::RECEIVE))
+				{
+					efef::set<efef::message> messages = socket.receive();
+					for (uint i = 0u; i < messages.size(); ++i)
 					{
-						efef::ostream out(msgs[i].data, msgs[i].size);
+						efef::message& msg = messages[i];
+						if (msg.type != efef::message_type::MESSAGE)
+							continue;
 
-						socket1ID = out.get_var<uint>();
-						uint port = out.get_var<uint>();
+						if (msg.data[0] == confirmation)
+							confirmation = 'B';
 
-						efef::socket_addr newAddress(L"127.0.0.1", port);
-
-						socket1.unilateral_disconnect();
-						socket1.connect(newAddress);
-
-						exit = true;
+						msg.destroy();
 					}
 				}
 			}
-
-			manager->update();
 		}
 
-		socket1.send(input1.get_buffer(), input1.size());
-
-		while (true)
+		while (Update(socket))
 		{
-			efef::set<const efef::server::client*> clients = server.pendant_clients();
-			for (uint i = 0u; i < clients.size(); ++i)
-			{
-				for (uint n = 0u; n < clients[i]->messages.size(); ++n)
-				{
-					efef::message& msg = clients[i]->messages[n];
-					if (msg.type == efef::message_type::MESSAGE)
-					{
-						const wchar_t* w = (const wchar_t*)(msg.data + sizeof(uint));
-						render->Log(w);
-						
-						server.send_to(clients[i], (const byte*)L"YOOO\0", 10u);
-					}
-				}
-			}
-
-			if (socket1.poll(efef::select_mode::RECEIVE))
-			{
-				efef::set<efef::message> msgs = socket1.receive();
-				for (uint i = 0u; i < msgs.size(); ++i)
-				{
-					render->Log((const wchar_t*)msgs[i].data);
-					msgs[i].destroy();
-				}
-			}
-
-			// RENDER
-			if (GetKey(VK_ESCAPE))
-				break;
-
-			for (uint i = 0u; i < manager->sockets.size(); ++i)
-			{
-				efef::fast_socket* socket = manager->sockets[i];
-
-				wchar_t recvIDs[126] = L"[";
-				for (uint r = 0u; r < socket->recvIDs.size(); ++r)
-					if (r != 0u)
-						swprintf_s(recvIDs, L"%s, %u", recvIDs, socket->recvIDs[r]);
-					else
-						swprintf_s(recvIDs, L"%s %u", recvIDs, socket->recvIDs[r]);
-				swprintf_s(recvIDs, L"%s ]", recvIDs);
-
-				wchar_t data[1024];
-				swprintf_s(data, L"Socket %u\nmessages: %u/%u\nunaknowledged: %u/%u\nreceived IDs: %u/%u -> %s\nnext ID: %u\n%u / %u\nconnected: %u",
-					i + 1u, socket->messages.size(), socket->messages.capacity(), socket->unaknowledged.size(), socket->unaknowledged.capacity(),
-					socket->recvIDs.size(), socket->recvIDs.capacity(), recvIDs, socket->nextID,
-					GetTickCount() - socket->lastSentTime, socket->send_rate_time, (uint)(socket->mRemote == true));
-
-				render->RenderText(0, data, fPoint(0.0f, (float)(0 + 8 * i)));
-			}
-
-
+			TextInput(socket);
 			manager->update();
 			render->Update(0.0f);
 		}
 	}
 
-	if (efef::CleanUp() == EFEF_ERROR)
-	{
-		return 0;
-	}
-	render->CleanUp();
+	CleanUp();
 
 	return 0;
 }
-
-/*
-	render = new Render(true);
-
-	if (efef::Init() == EFEF_ERROR)
-	{
-		return 0;
-	}
-	render->Start();
-
-
-	FastSocketTest();
-	if (false)
-	{
-		efef::socket_addr serveraddress(L"127.0.0.1", 6000u);
-		efef::socket_addr address1(L"127.0.0.1", 6001u);
-
-		efef::server server; server.fist_port = 6005u;
-		efef::fast_socket socket1 = efef::CreateFastSocket(efef::address_family::IPv4);
-		cstate state = cstate::DISC;
-
-		server.bind(serveraddress);
-		socket1.bind(address1);
-
-		socket1.connect(serveraddress);
-
-		efef::istream input1;
-		input1.push_var(9u);
-		input1.push_array("Socket 1", 9u);
-		socket1.send(input1.get_buffer(), input1.size());
-
-		while (true)
-		{
-			if (socket1.poll(efef::select_mode::RECEIVE))
-			{
-				efef::set<efef::message> messages = socket1.receive();
-				for (uint i = 0u; i < messages.size(); ++i)
-				{
-					switch (messages[i].type)
-					{
-					case efef::message_type::MESSAGE:
-					{
-						switch (state)
-						{
-						case cstate::DISC:
-						{
-							efef::ostream output(messages[i].data, messages[i].size);
-
-							uint ID = output.get_var<uint>();
-							uint port = output.get_var<uint>();
-
-							messages[i].destroy();
-
-							efef::socket_addr newserveraddress(L"127.0.0.1", port);
-							socket1.connect(newserveraddress);
-
-							//efef::istream input;
-							//input.push_var(124u);
-							//socket1.send(input.get_buffer(), input.size());
-						}
-							break;
-						case cstate::CON:
-						{
-							efef::ostream output(messages[i].data, messages[i].size);
-							uint n = output.get_var<uint>();
-
-							socket1.disconnect();
-						}
-							break;
-						}
-					}
-					break;
-					case efef::message_type::DISCONNECT:
-						break;
-					case efef::message_type::FAIL:
-						break;
-					}
-				}
-			}
-
-			efef::set<const efef::server::client*> clients = server.pendant_clients();
-			for (uint c = 0u; c < clients.size(); ++c)
-			{
-				for (uint i = 0u; i < clients[c]->messages.size(); ++i)
-				{
-					efef::ostream output(clients[c]->messages[i].data, clients[c]->messages[i].size);
-					uint n = output.get_var<uint>();
-
-					//efef::istream input;
-					//socket1.send(input.get_buffer(), input.size());
-					//server.send_to(clients[c], input.get_buffer(), input.size());
-				}
-			}
-
-			//efef::manager::instance()->update();
-			//render->Update(0.0f);
-		}
-
-		//PrintClientList(server);
-	}
-
-	if (efef::CleanUp() == EFEF_ERROR)
-	{
-		return 0;
-	}
-	render->CleanUp();
-
-	return 0;
-*/

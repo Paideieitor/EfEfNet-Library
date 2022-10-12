@@ -37,6 +37,9 @@
     <Filter Include="Source Files\Private\Render">
       <UniqueIdentifier>{115d1792-bad3-4090-868b-cef702ccd345}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{739cd01a-fb31-4d21-838c-4e058a2960a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
